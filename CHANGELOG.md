@@ -4,6 +4,18 @@ All notable changes to this project are documented here.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 versioning follows [SemVer](https://semver.org/).
 
+## [1.2.0] - 2026-11-11
+
+### Added
+
+- Skin system: `goku` (fan skin, default) and `nova` (original character).
+- NOVA original character: hooded courier with visor/core glow, 10 original
+  tiers (Ember → Zenith) sharing the Goku ladder thresholds exactly, so
+  switching skins never changes progression.
+- Nova relic set: 7 Nova Shards on the same milestone track, with skin-specific
+  HUD naming (BALLS vs SHARDS) in SVG, GIF, logs and accessibility text.
+- `skin` Action input and `--skin` CLI flag.
+
 ## [1.1.0] - 2026-11-10
 
 ### Changed

@@ -32,6 +32,8 @@ export interface ContributionStats {
   lifetimeEstimated?: boolean;
   /** True when the numbers are generated demo data. */
   isMock?: boolean;
+  /** Which skin rendered this card ('goku' | 'nova'). */
+  skinId: string;
 }
 
 export interface SaiyanConfig {
@@ -40,6 +42,8 @@ export interface SaiyanConfig {
   outputs?: string[];
   /** Path to the persisted progression state. Omit to disable persistence. */
   statePath?: string;
+  /** Character skin to render. Defaults to 'goku'. */
+  skin?: string;
   mock?: boolean;
   commits?: number;
   streak?: number;

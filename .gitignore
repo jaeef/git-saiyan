@@ -12,5 +12,6 @@ coverage/
 # Local-only: test suite, internal task board, pitch docs and demo media
 /tests/
 /WORKLOAD.md
+/CHANGELOG.md
 /docs/
 /assets/

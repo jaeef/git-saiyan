@@ -82,7 +82,7 @@ export async function fetchUserContributions(
   username: string,
   token?: string,
   mock: boolean = false,
-  options?: Pick<SaiyanConfig, 'commits' | 'streak' | 'form'>
+  options?: Pick<SaiyanConfig, 'commits' | 'streak' | 'form' | 'skin'>
 ): Promise<ContributionStats> {
   if (
     mock ||
@@ -237,14 +237,15 @@ export async function fetchUserContributions(
     unlockedBalls: calculateUnlockedBalls(totalContributions),
     lifetimeEstimated,
     isMock: false,
+    skinId: 'goku',
   };
 }
 
 export function generateMockStats(
   username: string,
-  options?: Pick<SaiyanConfig, 'commits' | 'streak' | 'form'>
+  options?: Pick<SaiyanConfig, 'commits' | 'streak' | 'form' | 'skin'>
 ): ContributionStats {
-  const form = options?.form ? findForm(options.form) : undefined;
+  const form = options?.form ? findForm(options.form, options.skin) : undefined;
   const targetLifetime = options?.commits ?? (form ? form.minContributions + 15 : 624);
   const targetStreak = options?.streak ?? 12;
   const rollingYearContributions = Math.max(1, Math.round(targetLifetime / 4));
@@ -291,5 +292,6 @@ export function generateMockStats(
     peakContributions: targetLifetime,
     unlockedBalls: calculateUnlockedBalls(targetLifetime),
     isMock: true,
+    skinId: options?.skin ?? 'goku',
   };
 }

@@ -1,3 +1,5 @@
+import type { SaiyanForm } from '../engine/forms.js';
+
 export interface PixelSprite {
   width: number;
   height: number;
@@ -281,5 +283,103 @@ export function getGokuSprite(formId: string): PixelSprite {
     palette,
     frames: [adultFrame1, adultFrame2],
   };
+}
+
+/* ------------------------------------------------------------------ */
+/* NOVA — original, distribution-safe skin (hooded energy courier)     */
+/* ------------------------------------------------------------------ */
+
+const NOVA_BASE_FRAME_1: string[] = [
+  '........................',
+  '........OOOOOO..........',
+  '......OOCCCCCCOO........',
+  '.....OCCCCCCCCCCO.......',
+  '.....OCCVVVVVVCCO.......',
+  '.....OCCVVVVVVCCO.......',
+  '.....OCCCCCCCCCCO.......',
+  '......OCCCCCCCCO........',
+  '.......OCCCCCCO.........',
+  '.....OOAAAAAAOO.........',
+  '...OAAAAAAAAAAAAO.......',
+  '..OAAAAKKKKKKAAAAO......',
+  '..OAAAKkkkkkkKAAAAO.....',
+  '..OAAAKkkKKkkKAAAAO.....',
+  '..OAAAKkkkkkkKAAAAO.....',
+  '..OAAAAKKKKKKAAAAO......',
+  '..OAAAAAAAAAAAAAAO......',
+  '...OAAAAAAAAAAAAO.......',
+  '....OAAAOOOOAAAO........',
+  '....OAAAO..OAAAO........',
+  '....OAAO....OAAO........',
+  '....OAAO....OAAO........',
+  '....OAAO....OAAO........',
+  '....OAAO....OAAO........',
+  '...OAAAAO..OAAAAO.......',
+  '...OAAAAO..OAAAAO.......',
+  '...OBBBO....OBBBO.......',
+  '...OBBBO....OBBBO.......',
+  '...OWWWO....OWWWO.......',
+  '....OOOO....OOOO........',
+];
+
+const NOVA_TIERS_WITH_CROWN = new Set(['corona', 'nebula', 'quasar', 'zenith']);
+
+function novaTierColor(form: SaiyanForm): { glow: string; shade: string } {
+  return { glow: form.auraColors.primary, shade: form.auraColors.secondary };
+}
+
+export function getNovaSprite(formId: string, form?: SaiyanForm): PixelSprite {
+  const palette: Record<string, string> = {
+    '.': 'transparent',
+    O: '#0b1220', // outline
+    C: '#334155', // cloak
+    c: '#1e293b', // cloak shade
+    A: '#475569', // armor
+    a: '#334155', // armor shade
+    W: '#e2e8f0', // boot light
+    B: '#1f2937', // boots
+  };
+
+  if (form) {
+    const { glow, shade } = novaTierColor(form);
+    palette.V = glow; // visor slit
+    palette.K = glow; // chest core
+    palette.k = shade; // core shade
+  } else {
+    palette.V = '#f97316';
+    palette.K = '#f97316';
+    palette.k = '#c2410c';
+  }
+
+  const withCrown = NOVA_TIERS_WITH_CROWN.has(formId);
+
+  const frame1 = NOVA_BASE_FRAME_1.map((row, index) => {
+    let out = row;
+    if (withCrown) {
+      if (index === 1) out = '......OVVCCCCVVO........';
+      if (index === 3) out = '.....VCCCCCCCCCCV.......';
+      if (index === 6) out = '......VCCCCCCCCV........';
+    }
+    return out;
+  });
+
+  // Frame 2: the core brightens on the pulse frame.
+  const frame2 = frame1.map((row) => row.replace(/k/g, 'K'));
+
+  return {
+    width: 24,
+    height: 30,
+    palette,
+    frames: [frame1, frame2],
+  };
+}
+
+/**
+ * Resolve the sprite for any skin/form combination. Goku keeps its own
+ * hand-drawn sprite table; NOVA uses palette-swapped original art.
+ */
+export function getSkinSprite(skinId: string, form: SaiyanForm): PixelSprite {
+  if (skinId === 'nova') return getNovaSprite(form.id, form);
+  return getGokuSprite(form.id);
 }
 

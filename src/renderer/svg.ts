@@ -1,5 +1,5 @@
 import type { ContributionStats } from '../api/types.js';
-import { calculateFormProgression } from '../engine/forms.js';
+import { calculateFormProgression, getSkin } from '../engine/forms.js';
 import {
   calculateDragonBalls,
   calculateUnlockedBalls,
@@ -10,7 +10,7 @@ import { calculateAuraFromStreak } from '../engine/streak.js';
 import {
   getDragonBallBaseSprite,
   getDragonBallStarLayout,
-  getGokuSprite,
+  getSkinSprite,
   type PixelSprite,
 } from '../assets/sprites.js';
 import {
@@ -106,9 +106,10 @@ function renderDragonBall(ball: DragonBall, index: number): string {
 }
 
 export function renderSvg(stats: ContributionStats): string {
+  const skin = getSkin(stats.skinId || 'goku');
   const effectiveContributions = stats.peakContributions ?? stats.totalContributions;
   const { currentForm, nextForm, progressPercent, contributionsToNext } =
-    calculateFormProgression(effectiveContributions);
+    calculateFormProgression(effectiveContributions, skin.id);
   const aura = calculateAuraFromStreak(stats.currentStreak, currentForm.hasSparks);
   const unlockedBalls = stats.unlockedBalls ?? calculateUnlockedBalls(effectiveContributions);
   const dragonBalls = calculateDragonBalls(unlockedBalls, 0, ORBIT);
@@ -120,10 +121,10 @@ export function renderSvg(stats: ContributionStats): string {
   const nextBall = nextDragonBallMilestone(effectiveContributions);
   const bestStreak = stats.bestStreak ?? stats.longestStreak;
 
-  const gokuSprite = getGokuSprite(currentForm.id);
+  const skinSprite = getSkinSprite(skin.id, currentForm);
   const gokuScale = 4; // integer scale keeps pixel art crisp
-  const gokuX = 250 - (gokuSprite.width * gokuScale) / 2;
-  const gokuY = 116 - (gokuSprite.height * gokuScale) / 2;
+  const gokuX = 250 - (skinSprite.width * gokuScale) / 2;
+  const gokuY = 116 - (skinSprite.height * gokuScale) / 2;
 
   const primaryAura = currentForm.auraColors.primary;
   const coreAura = currentForm.auraColors.core;
@@ -176,17 +177,18 @@ export function renderSvg(stats: ContributionStats): string {
 
   const progressWidth = Math.round((progressPercent / 100) * 120);
   const nextLabel = nextForm ? `NEXT: ${nextForm.name}` : 'MAX FORM';
-  const ballsLabel = `BALLS ${unlockedBalls}/7`;
+  const relicWord = skin.relic.short.replace(/S$/, '');
+  const ballsLabel = `${skin.relic.short} ${unlockedBalls}/7`;
   const relicLabel = nextBall
-    ? `next ball ${nextBall.star}★ at ${formatCompact(nextBall.at)}`
-    : 'all 7 dragon balls summoned';
+    ? `next ${relicWord.toLowerCase()} ${nextBall.star}★ at ${formatCompact(nextBall.at)}`
+    : `all 7 ${skin.relic.plural.toLowerCase()} summoned`;
   const subtitle = `${currentForm.title} · ${relicLabel}`;
   const username = escapeXml(stats.username);
   const joined = stats.joinedYear ? ` · since ${stats.joinedYear}` : '';
 
   return `<svg width="${CARD_WIDTH}" height="${CARD_HEIGHT}" viewBox="0 0 ${CARD_WIDTH} ${CARD_HEIGHT}" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="saiyan-title saiyan-desc">
   <title id="saiyan-title">${username}'s git-saiyan card</title>
-  <desc id="saiyan-desc">${escapeXml(currentForm.name)} with ${unlockedBalls} of 7 Dragon Balls, a ${stats.currentStreak} day streak, and power level ${stats.powerLevel}.</desc>
+  <desc id="saiyan-desc">${escapeXml(currentForm.name)} with ${unlockedBalls} of 7 ${escapeXml(skin.relic.plural)}, a ${stats.currentStreak} day streak, and power level ${stats.powerLevel}.</desc>
   <defs>
     <linearGradient id="bg-grad" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#090d16" />
@@ -256,7 +258,7 @@ export function renderSvg(stats: ContributionStats): string {
   ${backBalls.map(({ ball, index }) => renderDragonBall(ball, index)).join('')}
 
   <g class="goku-stance">
-    ${spriteToSvg(gokuSprite, gokuX, gokuY, gokuScale)}
+    ${spriteToSvg(skinSprite, gokuX, gokuY, gokuScale)}
   </g>
 
   ${lightningSvg}

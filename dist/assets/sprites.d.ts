@@ -1,3 +1,4 @@
+import type { SaiyanForm } from '../engine/forms.js';
 export interface PixelSprite {
     width: number;
     height: number;
@@ -14,3 +15,9 @@ export declare function getDragonBallStarLayout(stars: number): [number, number]
 /** 12x12 Dragon Ball sphere without stars. */
 export declare function getDragonBallBaseSprite(): PixelSprite;
 export declare function getGokuSprite(formId: string): PixelSprite;
+export declare function getNovaSprite(formId: string, form?: SaiyanForm): PixelSprite;
+/**
+ * Resolve the sprite for any skin/form combination. Goku keeps its own
+ * hand-drawn sprite table; NOVA uses palette-swapped original art.
+ */
+export declare function getSkinSprite(skinId: string, form: SaiyanForm): PixelSprite;

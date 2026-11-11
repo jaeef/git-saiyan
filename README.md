@@ -23,7 +23,19 @@ Animated **SVG** (SMIL) + **GIF** · zero Docker · zero native modules
 - **7 Dragon Balls.** Unlocked on an independent lifetime track (1 / 100 / 500 / 1,500 / 3,000 / 5,000 / 7,000 contributions) and rendered in a depth-scaled orbit.
 - **Streak-driven aura.** Committing today or yesterday keeps the streak alive. Future days that GitHub pads into the calendar are ignored.
 - **Two output formats.** An animated SVG (SMIL, with real text and vector stars) and an 8-frame GIF with the same HUD for platforms that don't render SVG.
+- **Two skins.** `goku` (unofficial fan art) and `nova` (original character, distribution-safe). Both share the same thresholds, so switching never changes progression.
 - **Transparent scoring.** Power level is `commits × 10 + PRs × 30 + reviews × 20 + best streak × 50`, computed from disjoint lifetime inputs.
+
+## Skins
+
+| Skin | Character | Relic set | Art status |
+| :-- | :-- | :-- | :-- |
+| `goku` | Goku (Dragon Ball) | Dragon Balls | Unofficial fan art — not for commercial use or marketplace listing |
+| `nova` | NOVA (original hooded courier) | Nova Shards | Original art — safe for any distribution |
+
+Both skins use identical lifetime thresholds and the same 7-relic milestones (1 / 100 / 500 / 1,500 / 3,000 / 5,000 / 7,000). Only names, art, and relic labels differ. Select with the `skin` Action input or `--skin` CLI flag.
+
+The `nova` ladder: Ember, Spark, Flare, Surge, Storm, Radiant, Corona, Nebula, Quasar, Zenith.
 
 ## Progression tables
 
@@ -149,6 +161,7 @@ github_token: ${{ secrets.SAIYAN_PAT }}
 | `github_user_name` | no | Repository owner | GitHub user to render. Must be a user, not an organization. |
 | `outputs` | no | `dist/saiyan.svg`, `dist/saiyan.gif` | Output paths, newline- or comma-separated. `.svg` and `.gif` are supported. |
 | `state_file` | no | `.saiyan-state.json` | Persisted progression. Commit it with the card. |
+| `skin` | no | `goku` | Character skin: `goku` (fan skin) or `nova` (original). |
 
 ## State file
 
@@ -188,6 +201,7 @@ node dist/cli.js init
 | `-c, --commits <count>` | Override lifetime contributions | — |
 | `-s, --streak <days>` | Override current streak | — |
 | `--state <path>` | Persist progression | disabled |
+| `--skin <skinId>` | Character skin (`goku` / `nova`) | `goku` |
 
 `--form`, `--commits`, and `--streak` always use demo data. Live rendering requires a token and fails loudly on API errors instead of falling back to mock output.
 
@@ -226,6 +240,8 @@ The engine and renderer test suite is maintained locally and is not published wi
 
 The code is licensed under the [MIT License](./LICENSE).
 
-Dragon Ball is a trademark of Bird Studio / Shueisha / Toei Animation. This is an unofficial fan project and is not affiliated with or endorsed by the rights holders. The MIT license covers the code, not the character art. Do not list this project on a marketplace or use it commercially without permission. Rights holders may request removal of the character assets.
+**Skin `nova`** is entirely original art and naming, designed so the project can be distributed, listed, or commercialized without third-party IP risk.
+
+**Skin `goku`** uses Dragon Ball character art. Dragon Ball is a trademark of Bird Studio / Shueisha / Toei Animation. This is an unofficial fan project and is not affiliated with or endorsed by the rights holders. The MIT license covers the code, not the fan character art. Do not use the `goku` skin commercially or on a marketplace. Rights holders may request its removal; the `nova` skin is the intended replacement.
 
 Inspired by [Platane/snk](https://github.com/Platane/snk) and [yalongwastaken/git-koi](https://github.com/yalongwastaken/git-koi).

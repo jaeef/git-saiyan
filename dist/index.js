@@ -20899,15 +20899,158 @@ var GOKU_FORMS = [
     title: "Autonomous Ultra Instinct"
   }
 ];
-function calculateFormProgression(contributions) {
+var NOVA_FORMS = [
+  {
+    id: "ember",
+    name: "EMBER",
+    saga: "Kindling",
+    minContributions: 0,
+    maxContributions: 49,
+    auraColors: { primary: "#f97316", secondary: "#c2410c", core: "#fed7aa" },
+    hairColor: "#1e293b",
+    hasSparks: false,
+    title: "First Light"
+  },
+  {
+    id: "spark",
+    name: "SPARK",
+    saga: "Kindling",
+    minContributions: 50,
+    maxContributions: 149,
+    auraColors: { primary: "#fbbf24", secondary: "#d97706", core: "#fef3c7" },
+    hairColor: "#1e293b",
+    hasSparks: false,
+    title: "The Circuit Opens"
+  },
+  {
+    id: "flare",
+    name: "FLARE",
+    saga: "Ignition",
+    minContributions: 150,
+    maxContributions: 299,
+    auraColors: { primary: "#fb923c", secondary: "#ea580c", core: "#ffedd5" },
+    hairColor: "#292524",
+    hasSparks: false,
+    title: "Signal Over Noise"
+  },
+  {
+    id: "surge",
+    name: "SURGE",
+    saga: "Ignition",
+    minContributions: 300,
+    maxContributions: 599,
+    auraColors: { primary: "#facc15", secondary: "#a16207", core: "#fef08a" },
+    hairColor: "#292524",
+    hasSparks: true,
+    sparkColor: "#fef08a",
+    title: "Momentum Compounds"
+  },
+  {
+    id: "storm",
+    name: "STORM",
+    saga: "Overclock",
+    minContributions: 600,
+    maxContributions: 999,
+    auraColors: { primary: "#38bdf8", secondary: "#0369a1", core: "#e0f2fe" },
+    hairColor: "#0c4a6e",
+    hasSparks: true,
+    sparkColor: "#bae6fd",
+    title: "Shipping Weather"
+  },
+  {
+    id: "radiant",
+    name: "RADIANT",
+    saga: "Overclock",
+    minContributions: 1e3,
+    maxContributions: 1749,
+    auraColors: { primary: "#fde047", secondary: "#ca8a04", core: "#ffffff" },
+    hairColor: "#a16207",
+    hasSparks: true,
+    sparkColor: "#fef9c3",
+    title: "Review Beacon"
+  },
+  {
+    id: "corona",
+    name: "CORONA",
+    saga: "Halo Drive",
+    minContributions: 1750,
+    maxContributions: 2999,
+    auraColors: { primary: "#fb7185", secondary: "#be123c", core: "#ffe4e6" },
+    hairColor: "#9f1239",
+    hasSparks: true,
+    sparkColor: "#fecdd3",
+    title: "Crown of Branches"
+  },
+  {
+    id: "nebula",
+    name: "NEBULA",
+    saga: "Halo Drive",
+    minContributions: 3e3,
+    maxContributions: 4499,
+    auraColors: { primary: "#a78bfa", secondary: "#6d28d9", core: "#ede9fe" },
+    hairColor: "#5b21b6",
+    hasSparks: true,
+    sparkColor: "#ddd6fe",
+    title: "Constellation Builder"
+  },
+  {
+    id: "quasar",
+    name: "QUASAR",
+    saga: "Event Horizon",
+    minContributions: 4500,
+    maxContributions: 6999,
+    auraColors: { primary: "#22d3ee", secondary: "#0e7490", core: "#cffafe" },
+    hairColor: "#155e75",
+    hasSparks: true,
+    sparkColor: "#a5f3fc",
+    title: "Lighthouse of Merges"
+  },
+  {
+    id: "zenith",
+    name: "ZENITH",
+    saga: "Event Horizon",
+    minContributions: 7e3,
+    maxContributions: Infinity,
+    auraColors: { primary: "#e2e8f0", secondary: "#818cf8", core: "#ffffff" },
+    hairColor: "#f8fafc",
+    hasSparks: true,
+    sparkColor: "#c084fc",
+    title: "Full Autonomy"
+  }
+];
+var SKINS = {
+  goku: {
+    id: "goku",
+    name: "GOKU",
+    forms: GOKU_FORMS,
+    relic: { singular: "Dragon Ball", plural: "Dragon Balls", short: "BALLS" },
+    original: false
+  },
+  nova: {
+    id: "nova",
+    name: "NOVA",
+    forms: NOVA_FORMS,
+    relic: { singular: "Nova Shard", plural: "Nova Shards", short: "SHARDS" },
+    original: true
+  }
+};
+function getSkin(skinId = "goku") {
+  const skin = SKINS[skinId];
+  if (!skin) {
+    throw new Error(`Unknown skin "${skinId}". Available skins: ${Object.keys(SKINS).join(", ")}.`);
+  }
+  return skin;
+}
+function calculateFormProgression(contributions, skinId = "goku") {
+  const forms = getSkin(skinId).forms;
   const safeContributions = Number.isFinite(contributions) ? Math.max(0, contributions) : 0;
-  let currentForm = GOKU_FORMS[0];
-  let nextForm = GOKU_FORMS[1] ?? null;
-  for (let i = 0; i < GOKU_FORMS.length; i++) {
-    const form = GOKU_FORMS[i];
+  let currentForm = forms[0];
+  let nextForm = forms[1] ?? null;
+  for (let i = 0; i < forms.length; i++) {
+    const form = forms[i];
     if (safeContributions >= form.minContributions) {
       currentForm = form;
-      nextForm = i + 1 < GOKU_FORMS.length ? GOKU_FORMS[i + 1] : null;
+      nextForm = i + 1 < forms.length ? forms[i + 1] : null;
     } else {
       break;
     }
@@ -20922,9 +21065,10 @@ function calculateFormProgression(contributions) {
   }
   return { currentForm, nextForm, progressPercent, contributionsToNext };
 }
-function findForm(query) {
+function findForm(query, skinId = "goku") {
   const needle = query.trim().toLowerCase();
-  return GOKU_FORMS.find((form) => form.id.toLowerCase() === needle) ?? GOKU_FORMS.find((form) => form.name.toLowerCase().includes(needle));
+  const forms = getSkin(skinId).forms;
+  return forms.find((form) => form.id.toLowerCase() === needle) ?? forms.find((form) => form.name.toLowerCase().includes(needle));
 }
 
 // src/engine/activity.ts
@@ -21196,11 +21340,12 @@ async function fetchUserContributions(username, token, mock = false, options) {
     peakContributions: totalContributions,
     unlockedBalls: calculateUnlockedBalls(totalContributions),
     lifetimeEstimated,
-    isMock: false
+    isMock: false,
+    skinId: "goku"
   };
 }
 function generateMockStats(username, options) {
-  const form = options?.form ? findForm(options.form) : void 0;
+  const form = options?.form ? findForm(options.form, options.skin) : void 0;
   const targetLifetime = options?.commits ?? (form ? form.minContributions + 15 : 624);
   const targetStreak = options?.streak ?? 12;
   const rollingYearContributions = Math.max(1, Math.round(targetLifetime / 4));
@@ -21243,7 +21388,8 @@ function generateMockStats(username, options) {
     joinedYear: 2019,
     peakContributions: targetLifetime,
     unlockedBalls: calculateUnlockedBalls(targetLifetime),
-    isMock: true
+    isMock: true,
+    skinId: options?.skin ?? "goku"
   };
 }
 
@@ -21553,6 +21699,92 @@ function getGokuSprite(formId) {
     frames: [adultFrame1, adultFrame2]
   };
 }
+var NOVA_BASE_FRAME_1 = [
+  "........................",
+  "........OOOOOO..........",
+  "......OOCCCCCCOO........",
+  ".....OCCCCCCCCCCO.......",
+  ".....OCCVVVVVVCCO.......",
+  ".....OCCVVVVVVCCO.......",
+  ".....OCCCCCCCCCCO.......",
+  "......OCCCCCCCCO........",
+  ".......OCCCCCCO.........",
+  ".....OOAAAAAAOO.........",
+  "...OAAAAAAAAAAAAO.......",
+  "..OAAAAKKKKKKAAAAO......",
+  "..OAAAKkkkkkkKAAAAO.....",
+  "..OAAAKkkKKkkKAAAAO.....",
+  "..OAAAKkkkkkkKAAAAO.....",
+  "..OAAAAKKKKKKAAAAO......",
+  "..OAAAAAAAAAAAAAAO......",
+  "...OAAAAAAAAAAAAO.......",
+  "....OAAAOOOOAAAO........",
+  "....OAAAO..OAAAO........",
+  "....OAAO....OAAO........",
+  "....OAAO....OAAO........",
+  "....OAAO....OAAO........",
+  "....OAAO....OAAO........",
+  "...OAAAAO..OAAAAO.......",
+  "...OAAAAO..OAAAAO.......",
+  "...OBBBO....OBBBO.......",
+  "...OBBBO....OBBBO.......",
+  "...OWWWO....OWWWO.......",
+  "....OOOO....OOOO........"
+];
+var NOVA_TIERS_WITH_CROWN = /* @__PURE__ */ new Set(["corona", "nebula", "quasar", "zenith"]);
+function novaTierColor(form) {
+  return { glow: form.auraColors.primary, shade: form.auraColors.secondary };
+}
+function getNovaSprite(formId, form) {
+  const palette = {
+    ".": "transparent",
+    O: "#0b1220",
+    // outline
+    C: "#334155",
+    // cloak
+    c: "#1e293b",
+    // cloak shade
+    A: "#475569",
+    // armor
+    a: "#334155",
+    // armor shade
+    W: "#e2e8f0",
+    // boot light
+    B: "#1f2937"
+    // boots
+  };
+  if (form) {
+    const { glow, shade } = novaTierColor(form);
+    palette.V = glow;
+    palette.K = glow;
+    palette.k = shade;
+  } else {
+    palette.V = "#f97316";
+    palette.K = "#f97316";
+    palette.k = "#c2410c";
+  }
+  const withCrown = NOVA_TIERS_WITH_CROWN.has(formId);
+  const frame1 = NOVA_BASE_FRAME_1.map((row, index) => {
+    let out = row;
+    if (withCrown) {
+      if (index === 1) out = "......OVVCCCCVVO........";
+      if (index === 3) out = ".....VCCCCCCCCCCV.......";
+      if (index === 6) out = "......VCCCCCCCCV........";
+    }
+    return out;
+  });
+  const frame2 = frame1.map((row) => row.replace(/k/g, "K"));
+  return {
+    width: 24,
+    height: 30,
+    palette,
+    frames: [frame1, frame2]
+  };
+}
+function getSkinSprite(skinId, form) {
+  if (skinId === "nova") return getNovaSprite(form.id, form);
+  return getGokuSprite(form.id);
+}
 
 // src/renderer/particles.ts
 function generateParticleTracks(particleCount, centerX, centerY, primaryColor, coreColor, duration = 2.6) {
@@ -21693,8 +21925,9 @@ function renderDragonBall(ball, index) {
   </g>`;
 }
 function renderSvg(stats) {
+  const skin = getSkin(stats.skinId || "goku");
   const effectiveContributions = stats.peakContributions ?? stats.totalContributions;
-  const { currentForm, nextForm, progressPercent, contributionsToNext } = calculateFormProgression(effectiveContributions);
+  const { currentForm, nextForm, progressPercent, contributionsToNext } = calculateFormProgression(effectiveContributions, skin.id);
   const aura = calculateAuraFromStreak(stats.currentStreak, currentForm.hasSparks);
   const unlockedBalls = stats.unlockedBalls ?? calculateUnlockedBalls(effectiveContributions);
   const dragonBalls = calculateDragonBalls(unlockedBalls, 0, ORBIT);
@@ -21703,10 +21936,10 @@ function renderSvg(stats) {
   const frontBalls = indexedBalls.filter(({ ball }) => ball.z >= 0);
   const nextBall = nextDragonBallMilestone(effectiveContributions);
   const bestStreak = stats.bestStreak ?? stats.longestStreak;
-  const gokuSprite = getGokuSprite(currentForm.id);
+  const skinSprite = getSkinSprite(skin.id, currentForm);
   const gokuScale = 4;
-  const gokuX = 250 - gokuSprite.width * gokuScale / 2;
-  const gokuY = 116 - gokuSprite.height * gokuScale / 2;
+  const gokuX = 250 - skinSprite.width * gokuScale / 2;
+  const gokuY = 116 - skinSprite.height * gokuScale / 2;
   const primaryAura = currentForm.auraColors.primary;
   const coreAura = currentForm.auraColors.core;
   const particleTracks = generateParticleTracks(
@@ -21748,14 +21981,15 @@ function renderSvg(stats) {
   }).join("");
   const progressWidth = Math.round(progressPercent / 100 * 120);
   const nextLabel = nextForm ? `NEXT: ${nextForm.name}` : "MAX FORM";
-  const ballsLabel = `BALLS ${unlockedBalls}/7`;
-  const relicLabel = nextBall ? `next ball ${nextBall.star}\u2605 at ${formatCompact(nextBall.at)}` : "all 7 dragon balls summoned";
+  const relicWord = skin.relic.short.replace(/S$/, "");
+  const ballsLabel = `${skin.relic.short} ${unlockedBalls}/7`;
+  const relicLabel = nextBall ? `next ${relicWord.toLowerCase()} ${nextBall.star}\u2605 at ${formatCompact(nextBall.at)}` : `all 7 ${skin.relic.plural.toLowerCase()} summoned`;
   const subtitle = `${currentForm.title} \xB7 ${relicLabel}`;
   const username = escapeXml(stats.username);
   const joined = stats.joinedYear ? ` \xB7 since ${stats.joinedYear}` : "";
   return `<svg width="${CARD_WIDTH}" height="${CARD_HEIGHT}" viewBox="0 0 ${CARD_WIDTH} ${CARD_HEIGHT}" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="saiyan-title saiyan-desc">
   <title id="saiyan-title">${username}'s git-saiyan card</title>
-  <desc id="saiyan-desc">${escapeXml(currentForm.name)} with ${unlockedBalls} of 7 Dragon Balls, a ${stats.currentStreak} day streak, and power level ${stats.powerLevel}.</desc>
+  <desc id="saiyan-desc">${escapeXml(currentForm.name)} with ${unlockedBalls} of 7 ${escapeXml(skin.relic.plural)}, a ${stats.currentStreak} day streak, and power level ${stats.powerLevel}.</desc>
   <defs>
     <linearGradient id="bg-grad" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#090d16" />
@@ -21825,7 +22059,7 @@ function renderSvg(stats) {
   ${backBalls.map(({ ball, index }) => renderDragonBall(ball, index)).join("")}
 
   <g class="goku-stance">
-    ${spriteToSvg(gokuSprite, gokuX, gokuY, gokuScale)}
+    ${spriteToSvg(skinSprite, gokuX, gokuY, gokuScale)}
   </g>
 
   ${lightningSvg}
@@ -22254,13 +22488,14 @@ function formatCompact2(value) {
 function renderGif(stats) {
   const totalFrames = 8;
   const delayMs = 110;
+  const skin = getSkin(stats.skinId || "goku");
   const effectiveContributions = stats.peakContributions ?? stats.totalContributions;
-  const { currentForm, nextForm, progressPercent, contributionsToNext } = calculateFormProgression(effectiveContributions);
+  const { currentForm, nextForm, progressPercent, contributionsToNext } = calculateFormProgression(effectiveContributions, skin.id);
   const aura = calculateAuraFromStreak(stats.currentStreak, currentForm.hasSparks);
   const unlockedBalls = stats.unlockedBalls ?? calculateUnlockedBalls(effectiveContributions);
   const bestStreak = stats.bestStreak ?? stats.longestStreak;
   const nextBall = nextDragonBallMilestone(effectiveContributions);
-  const gokuSprite = getGokuSprite(currentForm.id);
+  const skinSprite = getSkinSprite(skin.id, currentForm);
   const baseBall = getDragonBallBaseSprite();
   const gokuScale = 4;
   const frames = [];
@@ -22374,7 +22609,7 @@ function renderGif(stats) {
     drawText("GIT-SAIYAN", 24, 18, 2, "#f59e0b");
     fillRect(365, 16, 112, 22, 30, 27, 75, 255);
     drawText(`PL ${formatCompact2(stats.powerLevel)}`, 373, 22, 2, "#a5b4fc");
-    drawText(`BALLS ${unlockedBalls}/7`, 373, 42, 1, "#64748b");
+    drawText(`${skin.relic.short} ${unlockedBalls}/7`, 373, 42, 1, "#64748b");
     drawText(`@${stats.username}`, 24, 44, 1, "#64748b");
     const [auraR, auraG, auraB] = hexToRgba(currentForm.auraColors.primary);
     const auraPulse = Math.sin(timeProgress * Math.PI * 2) * 6;
@@ -22397,10 +22632,10 @@ function renderGif(stats) {
     }
     const sway = Math.round(Math.sin(timeProgress * Math.PI * 2) * 2);
     drawSprite(
-      gokuSprite,
+      skinSprite,
       frameIndex % 2,
-      250 - gokuSprite.width * gokuScale / 2,
-      116 - gokuSprite.height * gokuScale / 2 + sway,
+      250 - skinSprite.width * gokuScale / 2,
+      116 - skinSprite.height * gokuScale / 2 + sway,
       gokuScale,
       1
     );
@@ -22434,7 +22669,8 @@ function renderGif(stats) {
     }
     const titleWidth = textWidth(currentForm.name, 2);
     drawText(currentForm.name, Math.round(250 - titleWidth / 2), 194, 2, "#ffffff");
-    const subtitle = `${currentForm.title}${nextBall ? ` - NEXT BALL ${nextBall.star} AT ${formatCompact2(nextBall.at)}` : ""}`;
+    const relicWord = skin.relic.short.replace(/S$/, "");
+    const subtitle = `${currentForm.title}${nextBall ? ` - NEXT ${relicWord} ${nextBall.star} AT ${formatCompact2(nextBall.at)}` : ""}`;
     const subtitleWidth = textWidth(subtitle, 1);
     drawText(subtitle, Math.round(250 - subtitleWidth / 2), 210, 1, "#94a3b8");
     fillRect(24, 235, 150, 24, 24, 24, 27, 255);
@@ -22568,16 +22804,20 @@ async function runSaiyan(config) {
   if (!username) {
     throw new Error("A GitHub username is required.");
   }
-  console.log(`[git-saiyan] Summoning Goku for @${username}...`);
+  const skin = getSkin(config.skin);
+  console.log(`[git-saiyan] Summoning the ${skin.name} skin for @${username}...`);
   const stats = await fetchUserContributions(username, token, mock, {
     commits: config.commits,
     streak: config.streak,
-    form: config.form
+    form: config.form,
+    skin: skin.id
   });
   const previous = config.statePath ? loadState(config.statePath) : null;
-  const { stats: progressed, state } = applyProgression(stats, previous);
+  const { stats: baseStats, state } = applyProgression(stats, previous);
+  const progressed = { ...baseStats, skinId: skin.id };
   const { currentForm, nextForm, progressPercent } = calculateFormProgression(
-    progressed.peakContributions
+    progressed.peakContributions,
+    skin.id
   );
   console.log(`[git-saiyan] Current Form: ${currentForm.name} (${currentForm.title})`);
   console.log(
@@ -22585,7 +22825,7 @@ async function runSaiyan(config) {
   );
   console.log(`[git-saiyan] Power Level: ${progressed.powerLevel.toLocaleString("en-US")}`);
   console.log(
-    `[git-saiyan] Streak: ${progressed.currentStreak} days (best ${progressed.bestStreak}) \xB7 Dragon Balls ${progressed.unlockedBalls}/7`
+    `[git-saiyan] Streak: ${progressed.currentStreak} days (best ${progressed.bestStreak}) \xB7 ${skin.relic.plural} ${progressed.unlockedBalls}/7`
   );
   if (nextForm) {
     console.log(`[git-saiyan] Next Form: ${nextForm.name} (${progressPercent}%)`);
@@ -22639,7 +22879,8 @@ async function runAction() {
     const outputsInput = getInput("outputs") || DEFAULT_OUTPUTS.join("\n");
     const outputs = outputsInput.split(/[\n,]/).map((value) => value.trim()).filter(Boolean);
     const statePath = getInput("state_file") || ".saiyan-state.json";
-    await runSaiyan({ username, token, outputs, statePath });
+    const skin = getInput("skin") || "goku";
+    await runSaiyan({ username, token, outputs, statePath, skin });
   } catch (error2) {
     setFailed(`[git-saiyan] Action failed: ${error2.message}`);
   }

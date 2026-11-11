@@ -1,6 +1,6 @@
 import { GIFEncoder, quantize, applyPalette } from 'gifenc';
 import type { ContributionStats } from '../api/types.js';
-import { calculateFormProgression } from '../engine/forms.js';
+import { calculateFormProgression, getSkin } from '../engine/forms.js';
 import {
   calculateDragonBalls,
   calculateUnlockedBalls,
@@ -10,7 +10,7 @@ import { calculateAuraFromStreak } from '../engine/streak.js';
 import {
   getDragonBallBaseSprite,
   getDragonBallStarLayout,
-  getGokuSprite,
+  getSkinSprite,
 } from '../assets/sprites.js';
 import { generateKiAuraParticles, generateLightningArcs } from './particles.js';
 import { textToRects, textWidth } from './font.js';
@@ -44,14 +44,15 @@ export function renderGif(stats: ContributionStats): Uint8Array {
   const totalFrames = 8;
   const delayMs = 110;
 
+  const skin = getSkin(stats.skinId || 'goku');
   const effectiveContributions = stats.peakContributions ?? stats.totalContributions;
   const { currentForm, nextForm, progressPercent, contributionsToNext } =
-    calculateFormProgression(effectiveContributions);
+    calculateFormProgression(effectiveContributions, skin.id);
   const aura = calculateAuraFromStreak(stats.currentStreak, currentForm.hasSparks);
   const unlockedBalls = stats.unlockedBalls ?? calculateUnlockedBalls(effectiveContributions);
   const bestStreak = stats.bestStreak ?? stats.longestStreak;
   const nextBall = nextDragonBallMilestone(effectiveContributions);
-  const gokuSprite = getGokuSprite(currentForm.id);
+  const skinSprite = getSkinSprite(skin.id, currentForm);
   const baseBall = getDragonBallBaseSprite();
   const gokuScale = 4;
   const frames: Uint8ClampedArray[] = [];
@@ -85,7 +86,7 @@ export function renderGif(stats: ContributionStats): Uint8Array {
     };
 
     const drawSprite = (
-      sprite: typeof gokuSprite,
+      sprite: typeof skinSprite,
       spriteFrame: number,
       startX: number,
       startY: number,
@@ -186,7 +187,7 @@ export function renderGif(stats: ContributionStats): Uint8Array {
     drawText('GIT-SAIYAN', 24, 18, 2, '#f59e0b');
     fillRect(365, 16, 112, 22, 30, 27, 75, 255);
     drawText(`PL ${formatCompact(stats.powerLevel)}`, 373, 22, 2, '#a5b4fc');
-    drawText(`BALLS ${unlockedBalls}/7`, 373, 42, 1, '#64748b');
+    drawText(`${skin.relic.short} ${unlockedBalls}/7`, 373, 42, 1, '#64748b');
     drawText(`@${stats.username}`, 24, 44, 1, '#64748b');
 
     // Aura
@@ -217,10 +218,10 @@ export function renderGif(stats: ContributionStats): Uint8Array {
     // Goku
     const sway = Math.round(Math.sin(timeProgress * Math.PI * 2) * 2);
     drawSprite(
-      gokuSprite,
+      skinSprite,
       frameIndex % 2,
-      250 - (gokuSprite.width * gokuScale) / 2,
-      116 - (gokuSprite.height * gokuScale) / 2 + sway,
+      250 - (skinSprite.width * gokuScale) / 2,
+      116 - (skinSprite.height * gokuScale) / 2 + sway,
       gokuScale,
       1
     );
@@ -260,7 +261,8 @@ export function renderGif(stats: ContributionStats): Uint8Array {
     // Form name
     const titleWidth = textWidth(currentForm.name, 2);
     drawText(currentForm.name, Math.round(250 - titleWidth / 2), 194, 2, '#ffffff');
-    const subtitle = `${currentForm.title}${nextBall ? ` - NEXT BALL ${nextBall.star} AT ${formatCompact(nextBall.at)}` : ''}`;
+    const relicWord = skin.relic.short.replace(/S$/, '');
+    const subtitle = `${currentForm.title}${nextBall ? ` - NEXT ${relicWord} ${nextBall.star} AT ${formatCompact(nextBall.at)}` : ''}`;
     const subtitleWidth = textWidth(subtitle, 1);
     drawText(subtitle, Math.round(250 - subtitleWidth / 2), 210, 1, '#94a3b8');
 
