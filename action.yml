@@ -1,0 +1,30 @@
+name: 'Git Saiyan'
+author: 'git-saiyan'
+description: 'Transforms your GitHub contributions into an evolving, animated Dragon Ball pixel-art card (Goku).'
+branding:
+  icon: 'zap'
+  color: 'orange'
+
+inputs:
+  github_token:
+    description: 'GitHub token for querying contributions (e.g. secrets.GITHUB_TOKEN). Use a PAT to include private contributions.'
+    required: false
+    default: ${{ github.token }}
+  github_user_name:
+    description: 'GitHub username to generate stats for (defaults to the repository owner)'
+    required: false
+    default: ${{ github.repository_owner }}
+  outputs:
+    description: 'Output files to generate, one per line or comma-separated (e.g. dist/saiyan.svg)'
+    required: false
+    default: |
+      dist/saiyan.svg
+      dist/saiyan.gif
+  state_file:
+    description: 'JSON file used to keep progression monotonic across runs. Commit it with the generated card.'
+    required: false
+    default: '.saiyan-state.json'
+
+runs:
+  using: 'node24'
+  main: 'dist/action.js'

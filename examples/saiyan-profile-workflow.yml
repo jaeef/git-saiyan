@@ -1,0 +1,48 @@
+name: Update Git Saiyan
+
+on:
+  schedule:
+    # Nightly at 00:00 UTC. GitHub may delay scheduled runs by a few minutes.
+    - cron: '0 0 * * *'
+  workflow_dispatch: # Allows manual trigger from the Actions tab
+
+permissions:
+  contents: write # Required to publish the generated card to the output branch
+
+concurrency:
+  group: git-saiyan
+  cancel-in-progress: true
+
+jobs:
+  power-up:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout profile repository
+        uses: actions/checkout@v4
+
+      - name: Restore progression state
+        # Keeps peak XP and unlocked Dragon Balls across runs without touching main.
+        run: |
+          git fetch origin output --depth=1 || true
+          git show origin/output:.saiyan-state.json > .saiyan-state.json 2>/dev/null || true
+
+      - name: Run git-saiyan
+        uses: your-github-username/git-saiyan@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          outputs: |
+            dist/saiyan.svg
+            dist/saiyan.gif
+          state_file: .saiyan-state.json
+
+      - name: Publish generated card to the output branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f dist/saiyan.svg dist/saiyan.gif .saiyan-state.json
+          if git diff --staged --quiet; then
+            echo "No card changes today."
+          else
+            git commit -m "chore: power up Goku [skip ci]"
+            git push origin HEAD:output --force
+          fi
