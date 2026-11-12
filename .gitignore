@@ -9,9 +9,11 @@ node_modules/
 coverage/
 *.tgz
 
-# Local-only: internal task board, pitch docs and demo media
+# Local-only: internal task board, private pitch notes and demo media
 /WORKLOAD.md
-/docs/
+/docs/idea.md
+/docs/art-spec.md
+/docs/preview.html
 /assets/
 
 # Local preview pages (npm run gallery / scenarios / designs)
