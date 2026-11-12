@@ -1805,10 +1805,10 @@ var require_request = __commonJS({
           channels.create.publish({ request: this });
         }
       }
-      onBodySent(chunk) {
+      onBodySent(chunk2) {
         if (this[kHandler].onBodySent) {
           try {
-            return this[kHandler].onBodySent(chunk);
+            return this[kHandler].onBodySent(chunk2);
           } catch (err) {
             this.abort(err);
           }
@@ -1851,11 +1851,11 @@ var require_request = __commonJS({
           this.abort(err);
         }
       }
-      onData(chunk) {
+      onData(chunk2) {
         assert(!this.aborted);
         assert(!this.completed);
         try {
-          return this[kHandler].onData(chunk);
+          return this[kHandler].onData(chunk2);
         } catch (err) {
           this.abort(err);
           return false;
@@ -4092,7 +4092,7 @@ var require_util2 = __commonJS({
     try {
       crypto = require("crypto");
       const possibleRelevantHashes = ["sha256", "sha384", "sha512"];
-      supportedHashes = crypto.getHashes().filter((hash) => possibleRelevantHashes.includes(hash));
+      supportedHashes = crypto.getHashes().filter((hash2) => possibleRelevantHashes.includes(hash2));
     } catch {
     }
     function responseURL(response) {
@@ -4661,15 +4661,15 @@ var require_util2 = __commonJS({
       const bytes = [];
       let byteLength = 0;
       while (true) {
-        const { done, value: chunk } = await reader.read();
+        const { done, value: chunk2 } = await reader.read();
         if (done) {
           return Buffer.concat(bytes, byteLength);
         }
-        if (!isUint8Array(chunk)) {
+        if (!isUint8Array(chunk2)) {
           throw new TypeError("Received non-Uint8Array chunk");
         }
-        bytes.push(chunk);
-        byteLength += chunk.length;
+        bytes.push(chunk2);
+        byteLength += chunk2.length;
       }
     }
     function urlIsLocal(url) {
@@ -4772,18 +4772,18 @@ var require_util2 = __commonJS({
         super();
         this.#zlibOptions = zlibOptions;
       }
-      _transform(chunk, encoding, callback) {
+      _transform(chunk2, encoding, callback) {
         if (!this._inflateStream) {
-          if (chunk.length === 0) {
+          if (chunk2.length === 0) {
             callback();
             return;
           }
-          this._inflateStream = (chunk[0] & 15) === 8 ? zlib.createInflate(this.#zlibOptions) : zlib.createInflateRaw(this.#zlibOptions);
+          this._inflateStream = (chunk2[0] & 15) === 8 ? zlib.createInflate(this.#zlibOptions) : zlib.createInflateRaw(this.#zlibOptions);
           this._inflateStream.on("data", this.push.bind(this));
           this._inflateStream.on("end", () => this.push(null));
           this._inflateStream.on("error", (err) => this.destroy(err));
         }
-        this._inflateStream.write(chunk, encoding, callback);
+        this._inflateStream.write(chunk2, encoding, callback);
       }
       _final(callback) {
         if (this._inflateStream) {
@@ -5509,29 +5509,29 @@ Content-Disposition: form-data`;
         let hasUnknownSizeValue = false;
         for (const [name, value] of object) {
           if (typeof value === "string") {
-            const chunk2 = textEncoder.encode(prefix + `; name="${escape(normalizeLinefeeds(name))}"\r
+            const chunk3 = textEncoder.encode(prefix + `; name="${escape(normalizeLinefeeds(name))}"\r
 \r
 ${normalizeLinefeeds(value)}\r
 `);
-            blobParts.push(chunk2);
-            length += chunk2.byteLength;
+            blobParts.push(chunk3);
+            length += chunk3.byteLength;
           } else {
-            const chunk2 = textEncoder.encode(`${prefix}; name="${escape(normalizeLinefeeds(name))}"` + (value.name ? `; filename="${escape(value.name)}"` : "") + `\r
+            const chunk3 = textEncoder.encode(`${prefix}; name="${escape(normalizeLinefeeds(name))}"` + (value.name ? `; filename="${escape(value.name)}"` : "") + `\r
 Content-Type: ${value.type || "application/octet-stream"}\r
 \r
 `);
-            blobParts.push(chunk2, value, rn);
+            blobParts.push(chunk3, value, rn);
             if (typeof value.size === "number") {
-              length += chunk2.byteLength + value.size + rn.byteLength;
+              length += chunk3.byteLength + value.size + rn.byteLength;
             } else {
               hasUnknownSizeValue = true;
             }
           }
         }
-        const chunk = textEncoder.encode(`--${boundary}--\r
+        const chunk2 = textEncoder.encode(`--${boundary}--\r
 `);
-        blobParts.push(chunk);
-        length += chunk.byteLength;
+        blobParts.push(chunk2);
+        length += chunk2.byteLength;
         if (hasUnknownSizeValue) {
           length = null;
         }
@@ -5923,11 +5923,11 @@ var require_client_h1 = __commonJS({
       }
       readMore() {
         while (!this.paused && this.ptr) {
-          const chunk = this.socket.read();
-          if (chunk === null) {
+          const chunk2 = this.socket.read();
+          if (chunk2 === null) {
             break;
           }
-          this.execute(chunk);
+          this.execute(chunk2);
         }
       }
       execute(data) {
@@ -6596,12 +6596,12 @@ upgrade: ${upgrade}\r
       assert(contentLength !== 0 || client[kRunning] === 0, "stream body cannot be pipelined");
       let finished = false;
       const writer = new AsyncWriter({ abort, socket, request: request2, contentLength, client, expectsPayload, header });
-      const onData = function(chunk) {
+      const onData = function(chunk2) {
         if (finished) {
           return;
         }
         try {
-          if (!writer.write(chunk) && this.pause) {
+          if (!writer.write(chunk2) && this.pause) {
             this.pause();
           }
         } catch (err) {
@@ -6736,11 +6736,11 @@ upgrade: ${upgrade}\r
       socket.on("close", onDrain).on("drain", onDrain);
       const writer = new AsyncWriter({ abort, socket, request: request2, contentLength, client, expectsPayload, header });
       try {
-        for await (const chunk of body) {
+        for await (const chunk2 of body) {
           if (socket[kError]) {
             throw socket[kError];
           }
-          if (!writer.write(chunk)) {
+          if (!writer.write(chunk2)) {
             await waitForDrain();
           }
         }
@@ -6763,7 +6763,7 @@ upgrade: ${upgrade}\r
         this.abort = abort;
         socket[kWriting] = true;
       }
-      write(chunk) {
+      write(chunk2) {
         const { socket, request: request2, contentLength, client, bytesWritten, expectsPayload, header } = this;
         if (socket[kError]) {
           throw socket[kError];
@@ -6771,7 +6771,7 @@ upgrade: ${upgrade}\r
         if (socket.destroyed) {
           return false;
         }
-        const len = Buffer.byteLength(chunk);
+        const len = Buffer.byteLength(chunk2);
         if (!len) {
           return true;
         }
@@ -6801,9 +6801,9 @@ ${len.toString(16)}\r
 `, "latin1");
         }
         this.bytesWritten += len;
-        const ret = socket.write(chunk);
+        const ret = socket.write(chunk2);
         socket.uncork();
-        request2.onBodySent(chunk);
+        request2.onBodySent(chunk2);
         if (!ret) {
           if (socket[kParser].timeout && socket[kParser].timeoutType === TIMEOUT_HEADERS) {
             if (socket[kParser].timeout.refresh) {
@@ -7221,8 +7221,8 @@ var require_client_h2 = __commonJS({
         if (request2.onHeaders(Number(statusCode), parseH2Headers(realHeaders), stream.resume.bind(stream), "") === false) {
           stream.pause();
         }
-        stream.on("data", (chunk) => {
-          if (request2.onData(chunk) === false) {
+        stream.on("data", (chunk2) => {
+          if (request2.onData(chunk2) === false) {
             stream.pause();
           }
         });
@@ -7365,8 +7365,8 @@ var require_client_h2 = __commonJS({
         }
       );
       util.addListener(pipe, "data", onPipeData);
-      function onPipeData(chunk) {
-        request2.onBodySent(chunk);
+      function onPipeData(chunk2) {
+        request2.onBodySent(chunk2);
       }
     }
     async function writeBlob(abort, h2stream, body, client, request2, socket, contentLength, expectsPayload) {
@@ -7410,12 +7410,12 @@ var require_client_h2 = __commonJS({
       });
       h2stream.on("close", onDrain).on("drain", onDrain);
       try {
-        for await (const chunk of body) {
+        for await (const chunk2 of body) {
           if (socket[kError]) {
             throw socket[kError];
           }
-          const res = h2stream.write(chunk);
-          request2.onBodySent(chunk);
+          const res = h2stream.write(chunk2);
+          request2.onBodySent(chunk2);
           if (!res) {
             await waitForDrain();
           }
@@ -7528,10 +7528,10 @@ var require_redirect_handler = __commonJS({
           this.opts.body = null;
         }
       }
-      onData(chunk) {
+      onData(chunk2) {
         if (this.location) {
         } else {
-          return this.handler.onData(chunk);
+          return this.handler.onData(chunk2);
         }
       }
       onComplete(trailers) {
@@ -7543,9 +7543,9 @@ var require_redirect_handler = __commonJS({
           this.handler.onComplete(trailers);
         }
       }
-      onBodySent(chunk) {
+      onBodySent(chunk2) {
         if (this.handler.onBodySent) {
-          this.handler.onBodySent(chunk);
+          this.handler.onBodySent(chunk2);
         }
       }
     };
@@ -9184,8 +9184,8 @@ var require_retry_handler = __commonJS({
           this.abort = abort;
         }
       }
-      onBodySent(chunk) {
-        if (this.handler.onBodySent) return this.handler.onBodySent(chunk);
+      onBodySent(chunk2) {
+        if (this.handler.onBodySent) return this.handler.onBodySent(chunk2);
       }
       static [kRetryHandlerDefaultRetry](err, { state, opts }, cb) {
         const { statusCode, code, headers } = err;
@@ -9352,9 +9352,9 @@ var require_retry_handler = __commonJS({
         this.abort(err);
         return false;
       }
-      onData(chunk) {
-        this.start += chunk.length;
-        return this.handler.onData(chunk);
+      onData(chunk2) {
+        this.start += chunk2.length;
+        return this.handler.onData(chunk2);
       }
       onComplete(rawTrailers) {
         this.retryCount = 0;
@@ -9518,12 +9518,12 @@ var require_readable = __commonJS({
       removeListener(ev, ...args) {
         return this.off(ev, ...args);
       }
-      push(chunk) {
-        if (this[kConsume] && chunk !== null) {
-          consumePush(this[kConsume], chunk);
-          return this[kReading] ? super.push(chunk) : true;
+      push(chunk2) {
+        if (this[kConsume] && chunk2 !== null) {
+          consumePush(this[kConsume], chunk2);
+          return this[kReading] ? super.push(chunk2) : true;
         }
-        return super.push(chunk);
+        return super.push(chunk2);
       }
       // https://fetch.spec.whatwg.org/#dom-body-text
       async text() {
@@ -9589,8 +9589,8 @@ var require_readable = __commonJS({
             } else {
               resolve(null);
             }
-          }).on("error", noop2).on("data", function(chunk) {
-            limit -= chunk.length;
+          }).on("error", noop2).on("data", function(chunk2) {
+            limit -= chunk2.length;
             if (limit <= 0) {
               this.destroy();
             }
@@ -9652,8 +9652,8 @@ var require_readable = __commonJS({
           consumePush(consume2, state.buffer[n]);
         }
       } else {
-        for (const chunk of state.buffer) {
-          consumePush(consume2, chunk);
+        for (const chunk2 of state.buffer) {
+          consumePush(consume2, chunk2);
         }
       }
       if (state.endEmitted) {
@@ -9686,9 +9686,9 @@ var require_readable = __commonJS({
       const buffer = new Uint8Array(Buffer.allocUnsafeSlow(length).buffer);
       let offset = 0;
       for (let i = 0; i < chunks.length; ++i) {
-        const chunk = chunks[i];
-        buffer.set(chunk, offset);
-        offset += chunk.length;
+        const chunk2 = chunks[i];
+        buffer.set(chunk2, offset);
+        offset += chunk2.length;
       }
       return buffer;
     }
@@ -9711,9 +9711,9 @@ var require_readable = __commonJS({
         stream.destroy(err);
       }
     }
-    function consumePush(consume2, chunk) {
-      consume2.length += chunk.length;
-      consume2.body.push(chunk);
+    function consumePush(consume2, chunk2) {
+      consume2.length += chunk2.length;
+      consume2.body.push(chunk2);
     }
     function consumeFinish(consume2, err) {
       if (consume2.body === null) {
@@ -9750,9 +9750,9 @@ var require_util3 = __commonJS({
       let chunks = [];
       let length = 0;
       try {
-        for await (const chunk of body) {
-          chunks.push(chunk);
-          length += chunk.length;
+        for await (const chunk2 of body) {
+          chunks.push(chunk2);
+          length += chunk2.length;
           if (length > CHUNK_LIMIT) {
             chunks = [];
             length = 0;
@@ -9928,8 +9928,8 @@ var require_api_request = __commonJS({
           }
         }
       }
-      onData(chunk) {
-        return this.res.push(chunk);
+      onData(chunk2) {
+        return this.res.push(chunk2);
       }
       onComplete(trailers) {
         util.parseHeaders(trailers, this.trailers);
@@ -10154,9 +10154,9 @@ var require_api_stream = __commonJS({
         const needDrain = res.writableNeedDrain !== void 0 ? res.writableNeedDrain : res._writableState?.needDrain;
         return needDrain !== true;
       }
-      onData(chunk) {
+      onData(chunk2) {
         const { res } = this;
-        return res ? res.write(chunk) : true;
+        return res ? res.write(chunk2) : true;
       }
       onComplete(trailers) {
         const { res } = this;
@@ -10294,9 +10294,9 @@ var require_api_pipeline = __commonJS({
               body.resume();
             }
           },
-          write: (chunk, encoding, callback) => {
+          write: (chunk2, encoding, callback) => {
             const { req } = this;
-            if (req.push(chunk, encoding) || req._readableState.destroyed) {
+            if (req.push(chunk2, encoding) || req._readableState.destroyed) {
               callback();
             } else {
               req[kResume] = callback;
@@ -10362,9 +10362,9 @@ var require_api_pipeline = __commonJS({
         if (!body || typeof body.on !== "function") {
           throw new InvalidReturnValueError("expected Readable");
         }
-        body.on("data", (chunk) => {
+        body.on("data", (chunk2) => {
           const { ret, body: body2 } = this;
-          if (!ret.push(chunk) && body2.pause) {
+          if (!ret.push(chunk2) && body2.pause) {
             body2.pause();
           }
         }).on("error", (err) => {
@@ -10381,9 +10381,9 @@ var require_api_pipeline = __commonJS({
         });
         this.body = body;
       }
-      onData(chunk) {
+      onData(chunk2) {
         const { res } = this;
-        return res.push(chunk);
+        return res.push(chunk2);
       }
       onComplete(trailers) {
         const { res } = this;
@@ -11261,8 +11261,8 @@ var require_pending_interceptors_formatter = __commonJS({
     module2.exports = class PendingInterceptorsFormatter {
       constructor({ disableColors } = {}) {
         this.transform = new Transform({
-          transform(chunk, _enc, cb) {
-            cb(null, chunk);
+          transform(chunk2, _enc, cb) {
+            cb(null, chunk2);
           }
         });
         this.logger = new Console({
@@ -11599,8 +11599,8 @@ var require_dump = __commonJS({
         err = this.#reason ?? err;
         this.#handler.onError(err);
       }
-      onData(chunk) {
-        this.#size = this.#size + chunk.length;
+      onData(chunk2) {
+        this.#size = this.#size + chunk2.length;
         if (this.#size >= this.#maxSize) {
           this.#dumped = true;
           if (this.#aborted) {
@@ -14522,11 +14522,11 @@ var require_fetch = __commonJS({
               });
               return true;
             },
-            onData(chunk) {
+            onData(chunk2) {
               if (fetchParams.controller.dump) {
                 return;
               }
-              const bytes = chunk;
+              const bytes = chunk2;
               timingInfo.encodedBodySize += bytes.byteLength;
               return this.body.push(bytes);
             },
@@ -15050,8 +15050,8 @@ var require_util4 = __commonJS({
           }
           dataURL += ";base64,";
           const decoder = new StringDecoder("latin1");
-          for (const chunk of bytes) {
-            dataURL += btoa(decoder.write(chunk));
+          for (const chunk2 of bytes) {
+            dataURL += btoa(decoder.write(chunk2));
           }
           dataURL += btoa(decoder.end());
           return dataURL;
@@ -15079,8 +15079,8 @@ var require_util4 = __commonJS({
         case "BinaryString": {
           let binaryString = "";
           const decoder = new StringDecoder("latin1");
-          for (const chunk of bytes) {
-            binaryString += decoder.write(chunk);
+          for (const chunk2 of bytes) {
+            binaryString += decoder.write(chunk2);
           }
           binaryString += decoder.end();
           return binaryString;
@@ -15762,8 +15762,8 @@ var require_cache = __commonJS({
        * @returns {requestResponseList}
        */
       #batchCacheOperations(operations) {
-        const cache = this.#relevantRequestResponseList;
-        const backupCache = [...cache];
+        const cache2 = this.#relevantRequestResponseList;
+        const backupCache = [...cache2];
         const addedItems = [];
         const resultList = [];
         try {
@@ -15790,9 +15790,9 @@ var require_cache = __commonJS({
                 return [];
               }
               for (const requestResponse of requestResponses) {
-                const idx = cache.indexOf(requestResponse);
+                const idx = cache2.indexOf(requestResponse);
                 assert(idx !== -1);
-                cache.splice(idx, 1);
+                cache2.splice(idx, 1);
               }
             } else if (operation.type === "put") {
               if (operation.response == null) {
@@ -15822,11 +15822,11 @@ var require_cache = __commonJS({
               }
               requestResponses = this.#queryCache(operation.request);
               for (const requestResponse of requestResponses) {
-                const idx = cache.indexOf(requestResponse);
+                const idx = cache2.indexOf(requestResponse);
                 assert(idx !== -1);
-                cache.splice(idx, 1);
+                cache2.splice(idx, 1);
               }
-              cache.push([operation.request, operation.response]);
+              cache2.push([operation.request, operation.response]);
               addedItems.push([operation.request, operation.response]);
             }
             resultList.push([operation.request, operation.response]);
@@ -16000,13 +16000,13 @@ var require_cachestorage = __commonJS({
         if (options.cacheName != null) {
           if (this.#caches.has(options.cacheName)) {
             const cacheList = this.#caches.get(options.cacheName);
-            const cache = new Cache(kConstruct, cacheList);
-            return await cache.match(request2, options);
+            const cache2 = new Cache(kConstruct, cacheList);
+            return await cache2.match(request2, options);
           }
         } else {
           for (const cacheList of this.#caches.values()) {
-            const cache = new Cache(kConstruct, cacheList);
-            const response = await cache.match(request2, options);
+            const cache2 = new Cache(kConstruct, cacheList);
+            const response = await cache2.match(request2, options);
             if (response !== void 0) {
               return response;
             }
@@ -16036,12 +16036,12 @@ var require_cachestorage = __commonJS({
         webidl.argumentLengthCheck(arguments, 1, prefix);
         cacheName = webidl.converters.DOMString(cacheName, prefix, "cacheName");
         if (this.#caches.has(cacheName)) {
-          const cache2 = this.#caches.get(cacheName);
-          return new Cache(kConstruct, cache2);
+          const cache3 = this.#caches.get(cacheName);
+          return new Cache(kConstruct, cache3);
         }
-        const cache = [];
-        this.#caches.set(cacheName, cache);
-        return new Cache(kConstruct, cache);
+        const cache2 = [];
+        this.#caches.set(cacheName, cache2);
+        return new Cache(kConstruct, cache2);
       }
       /**
        * @see https://w3c.github.io/ServiceWorker/#cache-storage-delete
@@ -17293,8 +17293,8 @@ var require_connection = __commonJS({
         ws[kReadyState] = states.CLOSING;
       }
     }
-    function onSocketData(chunk) {
-      if (!this.ws[kByteParser].write(chunk)) {
+    function onSocketData(chunk2) {
+      if (!this.ws[kByteParser].write(chunk2)) {
         this.pause();
       }
     }
@@ -17372,7 +17372,7 @@ var require_permessage_deflate = __commonJS({
        * @param {boolean} fin Final fragment flag
        * @param {Function} callback Callback function
        */
-      decompress(chunk, fin, callback) {
+      decompress(chunk2, fin, callback) {
         if (!this.#inflate) {
           let windowBits = Z_DEFAULT_WINDOWBITS;
           if (this.#options.serverMaxWindowBits) {
@@ -17406,7 +17406,7 @@ var require_permessage_deflate = __commonJS({
             callback(err);
           });
         }
-        this.#inflate.write(chunk);
+        this.#inflate.write(chunk2);
         if (fin) {
           this.#inflate.write(tail);
         }
@@ -17485,9 +17485,9 @@ var require_receiver = __commonJS({
        * @param {Buffer} chunk
        * @param {() => void} callback
        */
-      _write(chunk, _, callback) {
-        this.#buffers.push(chunk);
-        this.#byteOffset += chunk.length;
+      _write(chunk2, _, callback) {
+        this.#buffers.push(chunk2);
+        this.#byteOffset += chunk2.length;
         this.#loop = true;
         this.run(callback);
       }
@@ -18424,16 +18424,16 @@ var require_eventsource_stream = __commonJS({
        * @param {Function} callback
        * @returns {void}
        */
-      _transform(chunk, _encoding, callback) {
-        if (chunk.length === 0) {
+      _transform(chunk2, _encoding, callback) {
+        if (chunk2.length === 0) {
           callback();
           return;
         }
-        if (this.maxEventSize > 0 && this.chunks.length >= this.maxBufferedChunks && chunk[0] !== LF && chunk[0] !== CR) {
+        if (this.maxEventSize > 0 && this.chunks.length >= this.maxBufferedChunks && chunk2[0] !== LF && chunk2[0] !== CR) {
           callback(createMaxEventSizeExceededError());
           return;
         }
-        this.chunks.push(chunk);
+        this.chunks.push(chunk2);
         if (this.checkBOM) {
           if (this.handleBOM()) {
             callback();
@@ -18640,10 +18640,10 @@ ${value}`;
         const chunks = [];
         let length = 0;
         for (let i = this.lineChunkIndex; i <= this.chunkIndex; i++) {
-          const chunk = this.chunks[i];
+          const chunk2 = this.chunks[i];
           const start = i === this.lineChunkIndex ? this.linePos : 0;
-          const end = i === this.chunkIndex ? this.pos : chunk.length;
-          const slice = chunk.subarray(start, end);
+          const end = i === this.chunkIndex ? this.pos : chunk2.length;
+          const slice = chunk2.subarray(start, end);
           length += slice.length;
           chunks.push(slice);
         }
@@ -18653,10 +18653,10 @@ ${value}`;
         let chunkIndex = this.lineChunkIndex;
         let pos = this.linePos;
         while (chunkIndex < this.chunks.length) {
-          const chunk = this.chunks[chunkIndex];
-          const remaining = chunk.length - pos;
+          const chunk2 = this.chunks[chunkIndex];
+          const remaining = chunk2.length - pos;
           if (offset < remaining) {
-            return chunk[pos + offset];
+            return chunk2[pos + offset];
           }
           offset -= remaining;
           chunkIndex++;
@@ -18665,8 +18665,8 @@ ${value}`;
       }
       discardLeadingBytes(count) {
         while (count > 0 && this.lineChunkIndex < this.chunks.length) {
-          const chunk = this.chunks[this.lineChunkIndex];
-          const remaining = chunk.length - this.linePos;
+          const chunk2 = this.chunks[this.lineChunkIndex];
+          const remaining = chunk2.length - this.linePos;
           if (count < remaining) {
             this.linePos += count;
             count = 0;
@@ -19156,6 +19156,7 @@ var require_undici = __commonJS({
 // src/index.ts
 var src_exports = {};
 __export(src_exports, {
+  parseStreakMode: () => parseStreakMode,
   runAction: () => runAction,
   runSaiyan: () => runSaiyan
 });
@@ -19227,11 +19228,11 @@ var Command = class {
     return cmdStr;
   }
 };
-function escapeData(s) {
-  return toCommandValue(s).replace(/%/g, "%25").replace(/\r/g, "%0D").replace(/\n/g, "%0A");
+function escapeData(s2) {
+  return toCommandValue(s2).replace(/%/g, "%25").replace(/\r/g, "%0D").replace(/\n/g, "%0A");
 }
-function escapeProperty(s) {
-  return toCommandValue(s).replace(/%/g, "%25").replace(/\r/g, "%0D").replace(/\n/g, "%0A").replace(/:/g, "%3A").replace(/,/g, "%2C");
+function escapeProperty(s2) {
+  return toCommandValue(s2).replace(/%/g, "%25").replace(/\r/g, "%0D").replace(/\n/g, "%0A").replace(/:/g, "%3A").replace(/,/g, "%2C");
 }
 
 // node_modules/@actions/http-client/lib/index.js
@@ -20789,7 +20790,7 @@ var GOKU_FORMS = [
     saga: "Dragon Ball (Early)",
     minContributions: 0,
     maxContributions: 49,
-    auraColors: { primary: "#ffffff", secondary: "#e2e8f0", core: "#f8fafc" },
+    auraColors: { primary: "#e0f2fe", secondary: "#7dd3fc", core: "#ffffff" },
     hairColor: "#1e293b",
     hasSparks: false,
     title: "The Boy from Mount Paozu"
@@ -20800,7 +20801,7 @@ var GOKU_FORMS = [
     saga: "Saiyan Saga",
     minContributions: 50,
     maxContributions: 149,
-    auraColors: { primary: "#cbd5e1", secondary: "#94a3b8", core: "#f1f5f9" },
+    auraColors: { primary: "#dbeafe", secondary: "#60a5fa", core: "#ffffff" },
     hairColor: "#0f172a",
     hasSparks: false,
     title: "Earth\u2019s Greatest Defender"
@@ -20899,150 +20900,8 @@ var GOKU_FORMS = [
     title: "Autonomous Ultra Instinct"
   }
 ];
-var NOVA_FORMS = [
-  {
-    id: "ember",
-    name: "EMBER",
-    saga: "Kindling",
-    minContributions: 0,
-    maxContributions: 49,
-    auraColors: { primary: "#f97316", secondary: "#c2410c", core: "#fed7aa" },
-    hairColor: "#1e293b",
-    hasSparks: false,
-    title: "First Light"
-  },
-  {
-    id: "spark",
-    name: "SPARK",
-    saga: "Kindling",
-    minContributions: 50,
-    maxContributions: 149,
-    auraColors: { primary: "#fbbf24", secondary: "#d97706", core: "#fef3c7" },
-    hairColor: "#1e293b",
-    hasSparks: false,
-    title: "The Circuit Opens"
-  },
-  {
-    id: "flare",
-    name: "FLARE",
-    saga: "Ignition",
-    minContributions: 150,
-    maxContributions: 299,
-    auraColors: { primary: "#fb923c", secondary: "#ea580c", core: "#ffedd5" },
-    hairColor: "#292524",
-    hasSparks: false,
-    title: "Signal Over Noise"
-  },
-  {
-    id: "surge",
-    name: "SURGE",
-    saga: "Ignition",
-    minContributions: 300,
-    maxContributions: 599,
-    auraColors: { primary: "#facc15", secondary: "#a16207", core: "#fef08a" },
-    hairColor: "#292524",
-    hasSparks: true,
-    sparkColor: "#fef08a",
-    title: "Momentum Compounds"
-  },
-  {
-    id: "storm",
-    name: "STORM",
-    saga: "Overclock",
-    minContributions: 600,
-    maxContributions: 999,
-    auraColors: { primary: "#38bdf8", secondary: "#0369a1", core: "#e0f2fe" },
-    hairColor: "#0c4a6e",
-    hasSparks: true,
-    sparkColor: "#bae6fd",
-    title: "Shipping Weather"
-  },
-  {
-    id: "radiant",
-    name: "RADIANT",
-    saga: "Overclock",
-    minContributions: 1e3,
-    maxContributions: 1749,
-    auraColors: { primary: "#fde047", secondary: "#ca8a04", core: "#ffffff" },
-    hairColor: "#a16207",
-    hasSparks: true,
-    sparkColor: "#fef9c3",
-    title: "Review Beacon"
-  },
-  {
-    id: "corona",
-    name: "CORONA",
-    saga: "Halo Drive",
-    minContributions: 1750,
-    maxContributions: 2999,
-    auraColors: { primary: "#fb7185", secondary: "#be123c", core: "#ffe4e6" },
-    hairColor: "#9f1239",
-    hasSparks: true,
-    sparkColor: "#fecdd3",
-    title: "Crown of Branches"
-  },
-  {
-    id: "nebula",
-    name: "NEBULA",
-    saga: "Halo Drive",
-    minContributions: 3e3,
-    maxContributions: 4499,
-    auraColors: { primary: "#a78bfa", secondary: "#6d28d9", core: "#ede9fe" },
-    hairColor: "#5b21b6",
-    hasSparks: true,
-    sparkColor: "#ddd6fe",
-    title: "Constellation Builder"
-  },
-  {
-    id: "quasar",
-    name: "QUASAR",
-    saga: "Event Horizon",
-    minContributions: 4500,
-    maxContributions: 6999,
-    auraColors: { primary: "#22d3ee", secondary: "#0e7490", core: "#cffafe" },
-    hairColor: "#155e75",
-    hasSparks: true,
-    sparkColor: "#a5f3fc",
-    title: "Lighthouse of Merges"
-  },
-  {
-    id: "zenith",
-    name: "ZENITH",
-    saga: "Event Horizon",
-    minContributions: 7e3,
-    maxContributions: Infinity,
-    auraColors: { primary: "#e2e8f0", secondary: "#818cf8", core: "#ffffff" },
-    hairColor: "#f8fafc",
-    hasSparks: true,
-    sparkColor: "#c084fc",
-    title: "Full Autonomy"
-  }
-];
-var SKINS = {
-  goku: {
-    id: "goku",
-    name: "GOKU",
-    forms: GOKU_FORMS,
-    relic: { singular: "Dragon Ball", plural: "Dragon Balls", short: "BALLS" },
-    original: false
-  },
-  nova: {
-    id: "nova",
-    name: "NOVA",
-    forms: NOVA_FORMS,
-    relic: { singular: "Nova Shard", plural: "Nova Shards", short: "SHARDS" },
-    original: true
-  }
-};
-function getSkin(skinId = "goku") {
-  const skin = SKINS[skinId];
-  if (!skin) {
-    throw new Error(`Unknown skin "${skinId}". Available skins: ${Object.keys(SKINS).join(", ")}.`);
-  }
-  return skin;
-}
-function calculateFormProgression(contributions, skinId = "goku") {
-  const forms = getSkin(skinId).forms;
+function calculateFormProgression(contributions) {
+  const forms = GOKU_FORMS;
   const safeContributions = Number.isFinite(contributions) ? Math.max(0, contributions) : 0;
   let currentForm = forms[0];
   let nextForm = forms[1] ?? null;
@@ -21065,9 +20924,9 @@ function calculateFormProgression(contributions, skinId = "goku") {
   }
   return { currentForm, nextForm, progressPercent, contributionsToNext };
 }
-function findForm(query, skinId = "goku") {
+function findForm(query) {
   const needle = query.trim().toLowerCase();
-  const forms = getSkin(skinId).forms;
+  const forms = GOKU_FORMS;
   return forms.find((form) => form.id.toLowerCase() === needle) ?? forms.find((form) => form.name.toLowerCase().includes(needle));
 }
 
@@ -21140,11 +20999,39 @@ function buildRecentDays(days, today, count = 14) {
 function computePowerLevel({ commits, prs, reviews, bestStreak }) {
   return Math.max(0, Math.round(commits * 10 + prs * 30 + reviews * 20 + bestStreak * 50));
 }
+function weekStart(dateKey) {
+  const day = (/* @__PURE__ */ new Date(`${dateKey}T00:00:00Z`)).getUTCDay();
+  return dateKeyOffset(dateKey, -((day + 6) % 7));
+}
+function computeWeeklyStreaks(days, today) {
+  const observed = filterUpcoming(days, today);
+  if (observed.length === 0) return { current: 0, longest: 0 };
+  const activeWeeks = new Set(observed.filter((day) => day.count > 0).map((day) => weekStart(day.date)));
+  const thisWeek = weekStart(today);
+  let current = 0;
+  let cursor = activeWeeks.has(thisWeek) ? thisWeek : dateKeyOffset(thisWeek, -7);
+  while (activeWeeks.has(cursor)) {
+    current++;
+    cursor = dateKeyOffset(cursor, -7);
+  }
+  const firstWeek = weekStart([...observed].sort((a, b) => a.date.localeCompare(b.date))[0].date);
+  let longest = 0;
+  let run = 0;
+  for (let week = firstWeek; week <= thisWeek; week = dateKeyOffset(week, 7)) {
+    if (activeWeeks.has(week)) {
+      run++;
+      longest = Math.max(longest, run);
+    } else if (week !== thisWeek) {
+      run = 0;
+    }
+  }
+  return { current, longest: Math.max(longest, current) };
+}
 
 // src/engine/dragonballs.ts
-var DRAGON_BALL_MILESTONES = [1, 100, 500, 1500, 3e3, 5e3, 7e3];
-function calculateUnlockedBalls(totalContributions) {
-  const safeTotal = Number.isFinite(totalContributions) ? totalContributions : 0;
+var DRAGON_BALL_MILESTONES = [10, 25, 50, 100, 200, 350, 500];
+function calculateUnlockedBalls(yearContributions) {
+  const safeTotal = Number.isFinite(yearContributions) ? yearContributions : 0;
   let unlocked = 0;
   for (const milestone of DRAGON_BALL_MILESTONES) {
     if (safeTotal >= milestone) unlocked++;
@@ -21190,6 +21077,17 @@ function calculateDragonBalls(unlockedCount, timeProgress, orbitConfig = { cente
 }
 
 // src/api/github.ts
+function sumLifetimeYears(years) {
+  const totals = { totalContributions: 0, totalCommits: 0, totalPRs: 0, totalReviews: 0 };
+  for (const year of years) {
+    if (!year) continue;
+    totals.totalContributions += year.contributionCalendar?.totalContributions ?? 0;
+    totals.totalCommits += year.totalCommitContributions ?? 0;
+    totals.totalPRs += year.totalPullRequestContributions ?? 0;
+    totals.totalReviews += year.totalPullRequestReviewContributions ?? 0;
+  }
+  return totals;
+}
 var CONTRIBUTIONS_QUERY = `
   query getUserContributions($username: String!, $from: DateTime!, $to: DateTime!) {
     user(login: $username) {
@@ -21215,6 +21113,9 @@ var CONTRIBUTIONS_QUERY = `
     }
   }
 `;
+function userNotFoundMessage(username) {
+  return `GitHub user @${username} was not found. If this repository is owned by an organization, set github_user_name to a personal account.`;
+}
 async function fetchUserContributions(username, token, mock = false, options) {
   if (mock || options?.commits !== void 0 || options?.streak !== void 0 || options?.form !== void 0) {
     return generateMockStats(username, options);
@@ -21236,12 +21137,14 @@ async function fetchUserContributions(username, token, mock = false, options) {
       headers: { authorization: `bearer ${token}` }
     });
   } catch (error2) {
-    throw new Error(`Failed to fetch contributions for @${username}: ${error2.message}`);
+    const message = error2.message;
+    if (/Could not resolve to a User/i.test(message)) {
+      throw new Error(userNotFoundMessage(username));
+    }
+    throw new Error(`Failed to fetch contributions for @${username}: ${message}`);
   }
   if (!response.user) {
-    throw new Error(
-      `GitHub user @${username} was not found. If this repository is owned by an organization, set github_user_name to a personal account.`
-    );
+    throw new Error(userNotFoundMessage(username));
   }
   const collection = response.user.contributionsCollection;
   const calendar = collection.contributionCalendar;
@@ -21258,6 +21161,7 @@ async function fetchUserContributions(username, token, mock = false, options) {
   }
   const currentStreak = computeCurrentStreak(allDays, today);
   const longestStreak = computeLongestStreak(allDays);
+  const weekly = computeWeeklyStreaks(allDays, today);
   const recentDays = buildRecentDays(allDays, today, 14);
   const rollingYearContributions = calendar.totalContributions;
   let totalContributions = rollingYearContributions;
@@ -21276,7 +21180,6 @@ async function fetchUserContributions(username, token, mock = false, options) {
             totalCommitContributions
             totalPullRequestContributions
             totalPullRequestReviewContributions
-            restrictedContributionsCount
             contributionCalendar { totalContributions }
           }`;
       }).join("\n");
@@ -21292,17 +21195,9 @@ async function fetchUserContributions(username, token, mock = false, options) {
         headers: { authorization: `bearer ${token}` }
       });
       if (lifetime.user) {
-        totalContributions = 0;
-        totalCommits = 0;
-        totalPRs = 0;
-        totalReviews = 0;
-        for (const year of Object.values(lifetime.user)) {
-          if (!year) continue;
-          totalContributions += (year.contributionCalendar?.totalContributions ?? 0) + (year.restrictedContributionsCount ?? 0);
-          totalCommits += year.totalCommitContributions ?? 0;
-          totalPRs += year.totalPullRequestContributions ?? 0;
-          totalReviews += year.totalPullRequestReviewContributions ?? 0;
-        }
+        ({ totalContributions, totalCommits, totalPRs, totalReviews } = sumLifetimeYears(
+          Object.values(lifetime.user)
+        ));
         if (totalContributions <= 0) {
           totalContributions = rollingYearContributions;
           lifetimeEstimated = true;
@@ -21338,14 +21233,20 @@ async function fetchUserContributions(username, token, mock = false, options) {
     recentDays,
     joinedYear: new Date(response.user.createdAt).getUTCFullYear(),
     peakContributions: totalContributions,
-    unlockedBalls: calculateUnlockedBalls(totalContributions),
+    unlockedBalls: calculateUnlockedBalls(rollingYearContributions),
+    currentWeekStreak: weekly.current,
+    longestWeekStreak: weekly.longest,
     lifetimeEstimated,
-    isMock: false,
-    skinId: "goku"
+    isMock: false
   };
 }
 function generateMockStats(username, options) {
-  const form = options?.form ? findForm(options.form, options.skin) : void 0;
+  const form = options?.form ? findForm(options.form) : void 0;
+  if (options?.form && !form) {
+    throw new Error(
+      `Unknown form "${options.form}". Available forms: ${GOKU_FORMS.map((item) => item.id).join(", ")}.`
+    );
+  }
   const targetLifetime = options?.commits ?? (form ? form.minContributions + 15 : 624);
   const targetStreak = options?.streak ?? 12;
   const rollingYearContributions = Math.max(1, Math.round(targetLifetime / 4));
@@ -21364,6 +21265,7 @@ function generateMockStats(username, options) {
   }
   const currentStreak = computeCurrentStreak(days, today);
   const longestStreak = Math.max(computeLongestStreak(days), targetStreak, 28);
+  const weekly = computeWeeklyStreaks(days, today);
   const bestStreak = Math.max(longestStreak, currentStreak);
   const totalCommits = targetLifetime;
   const totalPRs = Math.round(targetLifetime / 20);
@@ -21387,9 +21289,10 @@ function generateMockStats(username, options) {
     recentDays: buildRecentDays(days, today, 14),
     joinedYear: 2019,
     peakContributions: targetLifetime,
-    unlockedBalls: calculateUnlockedBalls(targetLifetime),
-    isMock: true,
-    skinId: options?.skin ?? "goku"
+    unlockedBalls: calculateUnlockedBalls(rollingYearContributions),
+    currentWeekStreak: weekly.current,
+    longestWeekStreak: weekly.longest,
+    isMock: true
   };
 }
 
@@ -21428,6 +21331,78 @@ function calculateAuraFromStreak(streak, formHasSparks) {
     sparkCount: 0,
     pulseSpeed: 0.8,
     label: "Calm Idle Ki"
+  };
+}
+
+// src/engine/card.ts
+function parseStreakMode(value) {
+  const mode = (value ?? "daily").trim().toLowerCase() || "daily";
+  if (mode !== "daily" && mode !== "weekly") {
+    throw new Error(`Unknown streak mode "${value}". Use daily or weekly.`);
+  }
+  return mode;
+}
+function powerStage(contributions, currentForm, nextForm) {
+  if (!nextForm) return 2;
+  const span = nextForm.minContributions - currentForm.minContributions;
+  const fraction = span > 0 ? (contributions - currentForm.minContributions) / span : 1;
+  return fraction >= 2 / 3 ? 2 : fraction >= 1 / 3 ? 1 : 0;
+}
+function estimateEta(contributionsToNext, rollingYearContributions) {
+  if (contributionsToNext <= 0) return { days: 0, long: "any day now", short: "NOW" };
+  const perDay = rollingYearContributions / 365;
+  if (!(perDay > 0)) return { days: null, long: "no recent pace", short: "NO PACE" };
+  const days = Math.ceil(contributionsToNext / perDay);
+  const unit = (count, word, short) => ({
+    days,
+    long: `in ~${count} ${word}${count === 1 ? "" : "s"}`,
+    short: `~${count} ${short}`
+  });
+  if (days < 14) return unit(days, "day", "D");
+  if (days < 60) return unit(Math.round(days / 7), "week", "WK");
+  if (days < 730) return unit(Math.round(days / 30.4), "month", "MO");
+  const years = Math.round(days / 365);
+  if (years > 20) return { days, long: "in 20+ years", short: "20+ YR" };
+  return unit(years, "year", "YR");
+}
+function auraDaysForWeeks(weeks) {
+  if (weeks >= 8) return 14;
+  if (weeks >= 4) return 7;
+  if (weeks >= 2) return 3;
+  return 0;
+}
+function buildCardModel(stats, timeProgress = 0, orbit) {
+  const contributions = stats.peakContributions ?? stats.totalContributions;
+  const { currentForm, nextForm, progressPercent, contributionsToNext } = calculateFormProgression(contributions);
+  const mode = stats.streakMode === "weekly" ? "weekly" : "daily";
+  const streak = mode === "weekly" ? {
+    mode,
+    current: stats.currentWeekStreak ?? 0,
+    best: Math.max(stats.bestWeekStreak ?? 0, stats.longestWeekStreak ?? 0, stats.currentWeekStreak ?? 0),
+    unit: "W",
+    noun: "week"
+  } : {
+    mode,
+    current: stats.currentStreak,
+    best: stats.bestStreak ?? stats.longestStreak,
+    unit: "D",
+    noun: "day"
+  };
+  const auraDays = mode === "weekly" ? auraDaysForWeeks(streak.current) : streak.current;
+  const yearContributions = stats.rollingYearContributions ?? 0;
+  const unlockedBalls = stats.unlockedBalls ?? calculateUnlockedBalls(yearContributions);
+  return {
+    currentForm,
+    nextForm,
+    progressPercent,
+    contributionsToNext,
+    stage: powerStage(contributions, currentForm, nextForm),
+    aura: calculateAuraFromStreak(auraDays, currentForm.hasSparks),
+    unlockedBalls,
+    nextBall: nextDragonBallMilestone(yearContributions),
+    eta: nextForm ? estimateEta(contributionsToNext, yearContributions) : null,
+    streak,
+    dragonBalls: calculateDragonBalls(unlockedBalls, timeProgress, orbit)
   };
 }
 
@@ -21480,387 +21455,950 @@ function getDragonBallBaseSprite() {
     frames: [baseSphere]
   };
 }
-function getGokuSprite(formId) {
-  const commonPalette = {
-    ".": "transparent",
-    "O": "#0f172a",
-    // outline
-    "S": "#ffedd5",
-    // skin
-    "s": "#f97316",
-    // skin shade
-    "G": "#ea580c",
-    // gi orange
-    "g": "#9a3412",
-    // gi shadow
-    "B": "#1d4ed8",
-    // undershirt/belt blue
-    "b": "#1e3a8a",
-    // boot blue
-    "W": "#ffffff",
-    // white (eyes/wristband)
-    "N": "#fde047",
-    // nimbus yellow
-    "P": "#dc2626"
-    // power pole red
-  };
-  let hairColor = "#0f172a";
-  let hairLight = "#334155";
-  let eyeColor = "#0f172a";
-  if (formId === "kaioken") {
-    hairColor = "#450a0a";
-    hairLight = "#7f1d1d";
-    eyeColor = "#dc2626";
-  } else if (formId === "ssj1") {
-    hairColor = "#eab308";
-    hairLight = "#fef08a";
-    eyeColor = "#06b6d4";
-  } else if (formId === "ssj2") {
-    hairColor = "#facc15";
-    hairLight = "#fef9c3";
-    eyeColor = "#22d3ee";
-  } else if (formId === "ssj3") {
-    hairColor = "#eab308";
-    hairLight = "#fef08a";
-    eyeColor = "#06b6d4";
-  } else if (formId === "ssj4") {
-    hairColor = "#0f172a";
-    hairLight = "#334155";
-    eyeColor = "#eab308";
-    commonPalette["G"] = "#b91c1c";
-    commonPalette["g"] = "#7f1d1d";
-  } else if (formId === "ssjg") {
-    hairColor = "#e11d48";
-    hairLight = "#fda4af";
-    eyeColor = "#f43f5e";
-  } else if (formId === "ssjb") {
-    hairColor = "#0284c7";
-    hairLight = "#7dd3fc";
-    eyeColor = "#38bdf8";
-  } else if (formId === "mui") {
-    hairColor = "#e2e8f0";
-    hairLight = "#ffffff";
-    eyeColor = "#cbd5e1";
+
+// src/art/raster.ts
+var SILHOUETTE = "#0d0912";
+var LIGHT = normalize([-0.55, -0.7, 0.62]);
+function normalize([x, y, z]) {
+  const length = Math.hypot(x, y, z) || 1;
+  return [x / length, y / length, z / length];
+}
+function surface(ox, oy) {
+  const lengthSquared = ox * ox + oy * oy;
+  if (lengthSquared >= 1) {
+    const length = Math.sqrt(lengthSquared);
+    return [ox / length, oy / length, 0];
   }
-  const palette = {
-    ...commonPalette,
-    "H": hairColor,
-    "h": hairLight,
-    "E": eyeColor
-  };
-  const adultFrame1 = [
-    "........HHHHHHHH........",
-    "......HHHHHHHHHHHH......",
-    "....HHHHhhhhHHHHHHHH....",
-    "...HHHHhhhhhhHHHHHHHH...",
-    "..HHHHHhhhhhhHHHHHHHHH..",
-    "..HHHHhhSSSSSSssHHHHHH..",
-    "...HHhhSWESSSsEWsHHHH...",
-    "....HhhSSSSSSssshHHH....",
-    ".....HhhSSssSSssHHH.....",
-    "......HhhSSssshHH.......",
-    ".......OOssssOO.........",
-    ".....OOBBBBBBBBOO.......",
-    "...OOGGBBBBBBBBGGOO.....",
-    "..OOGGGGBBBBBBGGGGGO....",
-    "..OGGGGGGBBBBGGGGGGO....",
-    "..OGGGGGGOBBOGGGGGGO....",
-    "..OGGGGGGOOOGGGGGGGO....",
-    "...OGGGGGGBBGGGGGGO.....",
-    "...OOBBBBBBBBBBBBOO.....",
-    "....OBBBBBBBBBBBBO......",
-    "....OGGGGGGGGGGGGO......",
-    "....OGGGGG..GGGGGO......",
-    "....OGGGGG..GGGGGO......",
-    "....OGGGGG..GGGGGO......",
-    "....OGGGGG..GGGGGO......",
-    "....Obbbbb..bbbbbO......",
-    "....Obbbbb..bbbbbO......",
-    "...Obbbbbb..bbbbbbO.....",
-    "...ObWWWWb..bWWWWbO.....",
-    "....OOOOOO..OOOOOO......"
-  ];
-  const adultFrame2 = [
-    "........HHHHHHHH........",
-    "......HHHHHHHHHHHH......",
-    "....HHHHhhhhHHHHHHHH....",
-    "...HHHHhhhhhhHHHHHHHH...",
-    "..HHHHHhhhhhhHHHHHHHHH..",
-    "..HHHHhhSSSSSSssHHHHHH..",
-    "...HHhhSWESSSsEWsHHHH...",
-    "....HhhSSSSSSssshHHH....",
-    ".....HhhSSssSSssHHH.....",
-    ".......OOssssOO.........",
-    ".....OOBBBBBBBBOO.......",
-    "...OOGGBBBBBBBBGGOO.....",
-    "..OOGGGGBBBBBBGGGGGO....",
-    "..OGGGGGGBBBBGGGGGGO....",
-    "..OGGGGGGOBBOGGGGGGO....",
-    "..OGGGGGGOOOGGGGGGGO....",
-    "...OGGGGGGBBGGGGGGO.....",
-    "...OOBBBBBBBBBBBBOO.....",
-    "....OBBBBBBBBBBBBO......",
-    "....OGGGGGGGGGGGGO......",
-    "....OGGGGG..GGGGGO......",
-    "....OGGGGG..GGGGGO......",
-    "....OGGGGG..GGGGGO......",
-    "....OGGGGG..GGGGGO......",
-    "....OGGGGG..GGGGGO......",
-    "....Obbbbb..bbbbbO......",
-    "....Obbbbb..bbbbbO......",
-    "...Obbbbbb..bbbbbbO.....",
-    "...ObWWWWb..bWWWWbO.....",
-    "....OOOOOO..OOOOOO......"
-  ];
-  if (formId === "kid") {
-    const kidFrame1 = [
-      ".........HHHH...........",
-      ".......HHHHHHHH.........",
-      ".....HHHHHHHHHHHH.......",
-      "....HHHHhhSSSSssHH......",
-      "...HHHHhhSWESsEWsHH.....",
-      "...PHHHhhSSSSssshHH.....",
-      "...PH.HhhSSssSsshH......",
-      "...P...OOssssOO.........",
-      "...P.OOBBBBBBBBOO.......",
-      "...POOGGBBBBBBGGOO......",
-      "...POGGGGBBBBGGGGO......",
-      "...POGGGGOOOOGGGGO......",
-      "...POOBBBBBBBBBBOO......",
-      "...P..Obbb..bbbbO.......",
-      "...P..Obbb..bbbbO.......",
-      "...P.OOOOOOOOOOOO.......",
-      "....ONNNNNNNNNNNNO......",
-      "..ONNNNNNNNNNNNNNNNO....",
-      ".ONNNNNNNNNNNNNNNNNNO...",
-      "ONNNNNNNNNNNNNNNNNNNNO..",
-      ".ONNNNNNNNNNNNNNNNNNO...",
-      "..ONNNNNNNNNNNNNNNNO....",
-      "....ONNNNNNNNNNNNO......",
-      "........................",
-      "........................",
-      "........................",
-      "........................",
-      "........................",
-      "........................",
-      "........................"
-    ];
-    return {
-      width: 24,
-      height: 30,
-      palette,
-      frames: [kidFrame1, kidFrame1]
-    };
-  }
-  if (formId === "ssj3") {
-    const ssj3Frame1 = [
-      "......HHHHHHHHHHHH......",
-      "....HHHHHHHHHHHHHHHH....",
-      "...HHHHHhhhhhhHHHHHHH...",
-      "..HHHHHHhhhhhhHHHHHHHH..",
-      ".HHHHHHHHSSSSssHHHHHHHH.",
-      ".HHHHHHHHWEssEWHHHHHHHH.",
-      ".HHHHHHHHSSSSssHHHHHHHH.",
-      ".HHHHHH..OOssOO..HHHHHH.",
-      ".HHHH..OOBBBBBOO..HHHHH.",
-      ".HHH.OOGGBBBBGGOO..HHHH.",
-      ".HHH.OGGGBBBGGGOO..HHHH.",
-      ".HH..OGGGOOOGGGO...HHHH.",
-      ".HH..OOBBBBBBBOO....HHH.",
-      ".HH...OBBBBBBBO.....HHH.",
-      ".HH...OGGGGGGGO.....HHH.",
-      ".HH...OGGG.GGGO.....HHH.",
-      ".HH...OGGG.GGGO.....HHH.",
-      ".HH...Obbb.bbbO.....HHH.",
-      ".HH...Obbb.bbbO......HH.",
-      ".HH...OOOO.OOOO......HH.",
-      ".HH..................HH.",
-      ".HH..................HH.",
-      "..H...................H.",
-      "........................",
-      "........................",
-      "........................",
-      "........................",
-      "........................",
-      "........................",
-      "........................"
-    ];
-    return {
-      width: 24,
-      height: 30,
-      palette,
-      frames: [ssj3Frame1, ssj3Frame1]
-    };
-  }
+  return [ox, oy, Math.sqrt(1 - lengthSquared)];
+}
+function ellipse(cx, cy, rx, ry) {
   return {
-    width: 24,
-    height: 30,
-    palette,
-    frames: [adultFrame1, adultFrame2]
-  };
-}
-var NOVA_BASE_FRAME_1 = [
-  "........................",
-  "........OOOOOO..........",
-  "......OOCCCCCCOO........",
-  ".....OCCCCCCCCCCO.......",
-  ".....OCCVVVVVVCCO.......",
-  ".....OCCVVVVVVCCO.......",
-  ".....OCCCCCCCCCCO.......",
-  "......OCCCCCCCCO........",
-  ".......OCCCCCCO.........",
-  ".....OOAAAAAAOO.........",
-  "...OAAAAAAAAAAAAO.......",
-  "..OAAAAKKKKKKAAAAO......",
-  "..OAAAKkkkkkkKAAAAO.....",
-  "..OAAAKkkKKkkKAAAAO.....",
-  "..OAAAKkkkkkkKAAAAO.....",
-  "..OAAAAKKKKKKAAAAO......",
-  "..OAAAAAAAAAAAAAAO......",
-  "...OAAAAAAAAAAAAO.......",
-  "....OAAAOOOOAAAO........",
-  "....OAAAO..OAAAO........",
-  "....OAAO....OAAO........",
-  "....OAAO....OAAO........",
-  "....OAAO....OAAO........",
-  "....OAAO....OAAO........",
-  "...OAAAAO..OAAAAO.......",
-  "...OAAAAO..OAAAAO.......",
-  "...OBBBO....OBBBO.......",
-  "...OBBBO....OBBBO.......",
-  "...OWWWO....OWWWO.......",
-  "....OOOO....OOOO........"
-];
-var NOVA_TIERS_WITH_CROWN = /* @__PURE__ */ new Set(["corona", "nebula", "quasar", "zenith"]);
-function novaTierColor(form) {
-  return { glow: form.auraColors.primary, shade: form.auraColors.secondary };
-}
-function getNovaSprite(formId, form) {
-  const palette = {
-    ".": "transparent",
-    O: "#0b1220",
-    // outline
-    C: "#334155",
-    // cloak
-    c: "#1e293b",
-    // cloak shade
-    A: "#475569",
-    // armor
-    a: "#334155",
-    // armor shade
-    W: "#e2e8f0",
-    // boot light
-    B: "#1f2937"
-    // boots
-  };
-  if (form) {
-    const { glow, shade } = novaTierColor(form);
-    palette.V = glow;
-    palette.K = glow;
-    palette.k = shade;
-  } else {
-    palette.V = "#f97316";
-    palette.K = "#f97316";
-    palette.k = "#c2410c";
-  }
-  const withCrown = NOVA_TIERS_WITH_CROWN.has(formId);
-  const frame1 = NOVA_BASE_FRAME_1.map((row, index) => {
-    let out = row;
-    if (withCrown) {
-      if (index === 1) out = "......OVVCCCCVVO........";
-      if (index === 3) out = ".....VCCCCCCCCCCV.......";
-      if (index === 6) out = "......VCCCCCCCCV........";
+    sample(x, y) {
+      const nx = (x - cx) / rx;
+      const ny = (y - cy) / ry;
+      if (nx * nx + ny * ny > 1) return null;
+      return surface(nx, ny);
     }
-    return out;
-  });
-  const frame2 = frame1.map((row) => row.replace(/k/g, "K"));
-  return {
-    width: 24,
-    height: 30,
-    palette,
-    frames: [frame1, frame2]
   };
 }
-function getSkinSprite(skinId, form) {
-  if (skinId === "nova") return getNovaSprite(form.id, form);
-  return getGokuSprite(form.id);
+function capsule(a, b, r0, r1 = r0) {
+  const dx = b[0] - a[0];
+  const dy = b[1] - a[1];
+  const lengthSquared = dx * dx + dy * dy || 1;
+  return {
+    sample(x, y) {
+      const t = Math.min(1, Math.max(0, ((x - a[0]) * dx + (y - a[1]) * dy) / lengthSquared));
+      const px = a[0] + dx * t;
+      const py = a[1] + dy * t;
+      const radius = r0 + (r1 - r0) * t;
+      const ox = x - px;
+      const oy = y - py;
+      if (ox * ox + oy * oy > radius * radius) return null;
+      return surface(ox / radius, oy / radius);
+    }
+  };
+}
+function spike(base, tip, width, bend = 0, sharpness = 0.9) {
+  const mx = (base[0] + tip[0]) / 2;
+  const my = (base[1] + tip[1]) / 2;
+  const ax = tip[0] - base[0];
+  const ay = tip[1] - base[1];
+  const axisLength = Math.hypot(ax, ay) || 1;
+  const control = [mx + -ay / axisLength * bend, my + ax / axisLength * bend];
+  const steps = 24;
+  const points = [];
+  for (let i = 0; i <= steps; i++) {
+    const t = i / steps;
+    const u = 1 - t;
+    points.push([
+      u * u * base[0] + 2 * u * t * control[0] + t * t * tip[0],
+      u * u * base[1] + 2 * u * t * control[1] + t * t * tip[1]
+    ]);
+  }
+  const minX = Math.min(...points.map((p) => p[0])) - width;
+  const maxX = Math.max(...points.map((p) => p[0])) + width;
+  const minY = Math.min(...points.map((p) => p[1])) - width;
+  const maxY = Math.max(...points.map((p) => p[1])) + width;
+  return {
+    sample(x, y) {
+      if (x < minX || x > maxX || y < minY || y > maxY) return null;
+      let best = Infinity;
+      let bestIndex = 0;
+      for (let i = 0; i <= steps; i++) {
+        const distance = (x - points[i][0]) ** 2 + (y - points[i][1]) ** 2;
+        if (distance < best) {
+          best = distance;
+          bestIndex = i;
+        }
+      }
+      const t = bestIndex / steps;
+      const half = width / 2 * Math.pow(1 - t, sharpness);
+      if (half < 0.3 || best > half * half) return null;
+      const [px, py] = points[bestIndex];
+      return surface((x - px) / half, (y - py) / half);
+    }
+  };
+}
+function polygon(points, center, rx, ry) {
+  return {
+    sample(x, y) {
+      let inside = false;
+      for (let i = 0, j2 = points.length - 1; i < points.length; j2 = i++) {
+        const [xi, yi] = points[i];
+        const [xj, yj] = points[j2];
+        if (yi > y !== yj > y && x < (xj - xi) * (y - yi) / (yj - yi) + xi) inside = !inside;
+      }
+      if (!inside) return null;
+      return surface((x - center[0]) / rx * 0.9, (y - center[1]) / ry * 0.9);
+    }
+  };
+}
+function hexToRgb(hex) {
+  const clean = hex.replace("#", "");
+  return [
+    parseInt(clean.slice(0, 2), 16),
+    parseInt(clean.slice(2, 4), 16),
+    parseInt(clean.slice(4, 6), 16)
+  ];
+}
+function rgbToHex(r, g, b) {
+  return `#${[r, g, b].map((value) => Math.max(0, Math.min(255, Math.round(value))).toString(16).padStart(2, "0")).join("")}`;
+}
+function mix(a, b, amount) {
+  const [ar, ag, ab] = hexToRgb(a);
+  const [br, bg, bb] = hexToRgb(b);
+  return rgbToHex(ar + (br - ar) * amount, ag + (bg - ag) * amount, ab + (bb - ab) * amount);
+}
+function tintRamp(ramp2, color, amount) {
+  return {
+    tones: ramp2.tones.map((tone) => mix(tone, color, amount)),
+    line: ramp2.line ? mix(ramp2.line, color, amount * 0.6) : void 0
+  };
+}
+function createImage(width, height) {
+  return { width, height, data: new Uint8ClampedArray(width * height * 4) };
+}
+function blendPixel(image, x, y, color, alpha = 1) {
+  if (x < 0 || y < 0 || x >= image.width || y >= image.height || alpha <= 0) return;
+  const [r, g, b] = hexToRgb(color);
+  const index = (y * image.width + x) * 4;
+  const dstAlpha = image.data[index + 3] / 255;
+  const outAlpha = alpha + dstAlpha * (1 - alpha);
+  if (outAlpha <= 0) return;
+  const blend = (src, dst) => (src * alpha + dst * dstAlpha * (1 - alpha)) / outAlpha;
+  image.data[index] = blend(r, image.data[index]);
+  image.data[index + 1] = blend(g, image.data[index + 1]);
+  image.data[index + 2] = blend(b, image.data[index + 2]);
+  image.data[index + 3] = outAlpha * 255;
+}
+function drawImage(target, source, offsetX = 0, offsetY = 0) {
+  for (let y = 0; y < source.height; y++) {
+    for (let x = 0; x < source.width; x++) {
+      const index = (y * source.width + x) * 4;
+      const alpha = source.data[index + 3] / 255;
+      if (alpha <= 0) continue;
+      blendPixel(
+        target,
+        x + offsetX,
+        y + offsetY,
+        rgbToHex(source.data[index], source.data[index + 1], source.data[index + 2]),
+        alpha
+      );
+    }
+  }
+}
+function alphaMask(image, threshold = 200) {
+  const mask = new Uint8Array(image.width * image.height);
+  for (let i = 0; i < mask.length; i++) mask[i] = image.data[i * 4 + 3] >= threshold ? 1 : 0;
+  return mask;
+}
+function rasterize(width, height, parts, strokes = [], overlay = []) {
+  const size = width * height;
+  const owner = new Int16Array(size).fill(-1);
+  const tone = new Uint8Array(size);
+  const edge = new Uint8Array(size);
+  parts.forEach((part, partIndex) => {
+    const inside = new Uint8Array(size);
+    const toneHere = new Uint8Array(size);
+    for (let y = 0; y < height; y++) {
+      for (let x = 0; x < width; x++) {
+        let best = null;
+        for (const prim of part.prims) {
+          const normal = prim.sample(x + 0.5, y + 0.5);
+          if (normal && (!best || normal[2] > best[2])) best = normal;
+        }
+        if (!best) continue;
+        const index = y * width + x;
+        inside[index] = 1;
+        const lit = Math.max(0, best[0] * LIGHT[0] + best[1] * LIGHT[1] + best[2] * LIGHT[2]);
+        let level = lit > 0.86 ? 0 : lit > 0.6 ? 1 : lit > 0.3 ? 2 : 3;
+        level = Math.min(3, Math.max(0, level + (part.bias ?? 0)));
+        toneHere[index] = level;
+      }
+    }
+    for (let y = 0; y < height; y++) {
+      for (let x = 0; x < width; x++) {
+        const index = y * width + x;
+        if (!inside[index]) continue;
+        owner[index] = partIndex;
+        tone[index] = toneHere[index];
+        const isBorder = x === 0 || y === 0 || x === width - 1 || y === height - 1 || !inside[index - 1] || !inside[index + 1] || !inside[index - width] || !inside[index + width];
+        edge[index] = isBorder && !part.noOutline ? 1 : 0;
+      }
+    }
+  });
+  const colors = new Array(size).fill(null);
+  for (let index = 0; index < size; index++) {
+    const partIndex = owner[index];
+    if (partIndex < 0) continue;
+    colors[index] = parts[partIndex].ramp.tones[tone[index]];
+  }
+  for (const stroke of strokes) {
+    for (let i = 0; i < stroke.points.length - 1; i++) {
+      forLine(stroke.points[i], stroke.points[i + 1], (x, y) => {
+        const index = y * width + x;
+        if (x < 0 || y < 0 || x >= width || y >= height || owner[index] < 0 || edge[index]) return;
+        colors[index] = stroke.color ?? parts[owner[index]].ramp.tones[stroke.tone ?? 2];
+      });
+    }
+  }
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const index = y * width + x;
+      if (!edge[index] || owner[index] < 0) continue;
+      const touchesEmpty = x === 0 || y === 0 || x === width - 1 || y === height - 1 || owner[index - 1] < 0 || owner[index + 1] < 0 || owner[index - width] < 0 || owner[index + width] < 0;
+      const ramp2 = parts[owner[index]].ramp;
+      colors[index] = touchesEmpty ? SILHOUETTE : ramp2.line ?? mix(ramp2.tones[3], SILHOUETTE, 0.45);
+    }
+  }
+  for (const pixel of overlay) {
+    const x = Math.round(pixel.x);
+    const y = Math.round(pixel.y);
+    if (x < 0 || y < 0 || x >= width || y >= height) continue;
+    colors[y * width + x] = pixel.color;
+  }
+  const image = createImage(width, height);
+  for (let index = 0; index < size; index++) {
+    const color = colors[index];
+    if (!color) continue;
+    const [r, g, b] = hexToRgb(color);
+    image.data[index * 4] = r;
+    image.data[index * 4 + 1] = g;
+    image.data[index * 4 + 2] = b;
+    image.data[index * 4 + 3] = 255;
+  }
+  return image;
+}
+function forLine(a, b, visit) {
+  let x0 = Math.round(a[0]);
+  let y0 = Math.round(a[1]);
+  const x1 = Math.round(b[0]);
+  const y1 = Math.round(b[1]);
+  const dx = Math.abs(x1 - x0);
+  const dy = -Math.abs(y1 - y0);
+  const sx = x0 < x1 ? 1 : -1;
+  const sy = y0 < y1 ? 1 : -1;
+  let error2 = dx + dy;
+  for (; ; ) {
+    visit(x0, y0);
+    if (x0 === x1 && y0 === y1) break;
+    const doubled = 2 * error2;
+    if (doubled >= dy) {
+      error2 += dy;
+      x0 += sx;
+    }
+    if (doubled <= dx) {
+      error2 += dx;
+      y0 += sy;
+    }
+  }
 }
 
-// src/renderer/particles.ts
-function generateParticleTracks(particleCount, centerX, centerY, primaryColor, coreColor, duration = 2.6) {
-  const tracks = [];
-  for (let i = 0; i < particleCount; i++) {
-    const phase = i / Math.max(1, particleCount);
-    const angle = i * 2.39996;
-    const spread = 42;
-    const x0 = centerX + Math.sin(angle) * spread;
-    const x1 = centerX + Math.sin(angle + 2.2) * spread * 0.55;
-    const y0 = centerY + 52;
-    const y1 = centerY - 44 - i % 3 * 6;
-    tracks.push({
-      x0: Math.round(x0),
-      y0: Math.round(y0),
-      x1: Math.round(x1),
-      y1: Math.round(y1),
-      r0: 1.1 + i % 3 * 0.5,
-      r1: 2.2 + i % 4 * 0.45,
-      color: i % 3 === 0 ? coreColor : primaryColor,
-      delay: Number((phase * duration).toFixed(2)),
-      duration
+// src/art/goku.ts
+var CANVAS_WIDTH = 128;
+var CANVAS_HEIGHT = 120;
+var GROUND = 110;
+var Y = 20;
+var CX = CANVAS_WIDTH / 2;
+var ramp = (hi, base, shadow, deep, line) => ({
+  tones: [hi, base, shadow, deep],
+  line
+});
+var SKIN = ramp("#ffe4c8", "#f5bd8e", "#d48862", "#9a5340", "#5e2a28");
+var GI = ramp("#ffb956", "#f5821e", "#c95512", "#842f12", "#4d1a10");
+var BLUE = ramp("#5f8cf0", "#2f56cc", "#203693", "#151d5c", "#0e1238");
+var BOOT = ramp("#4d74dc", "#2a47ab", "#1c2d76", "#121a49", "#0b0f2c");
+var FUR = ramp("#ff7f6e", "#d9323d", "#9f1b33", "#5f0f24", "#3a0818");
+var TAIL = ramp("#b9774b", "#8a4f2f", "#5f3220", "#3b1e15");
+var GOLD_BELT = ramp("#fff1a8", "#f2c94c", "#c48a1c", "#7d5310");
+var POLE = ramp("#ff8a7a", "#e2352f", "#a51d2a", "#64101d");
+var NIMBUS = ramp("#fffbe0", "#ffe78a", "#f2b93b", "#c27c1c", "#7a4a10");
+var HAIR = {
+  black: ramp("#56567a", "#2b2b45", "#18182d", "#0e0e1c", "#08080f"),
+  gold: ramp("#fffcc4", "#ffe356", "#f0ad1f", "#b06a10", "#6b3b08"),
+  paleGold: ramp("#ffffdc", "#fff08a", "#f6c33c", "#c07f16", "#6b4209"),
+  crimson: ramp("#ff9cb0", "#ff4a6e", "#c8204f", "#7c1035", "#4a0820"),
+  blue: ramp("#c4f6ff", "#55d8ff", "#2299d8", "#165c9c", "#0b3360"),
+  silver: ramp("#ffffff", "#e2e6f4", "#aab1d2", "#6d739c", "#3c4066")
+};
+var FORM_STYLES = {
+  kid: { hair: "base", hairRamp: HAIR.black, iris: "#1a1426", brows: true, outfit: "gi", build: "kid", tail: true, pole: true, nimbus: true },
+  base: { hair: "base", hairRamp: HAIR.black, iris: "#1a1426", brows: true, outfit: "gi", build: "adult" },
+  kaioken: { hair: "base", hairRamp: HAIR.black, iris: "#1a1426", brows: true, outfit: "gi", build: "adult", tint: { color: "#ff1f2d", amount: 0.32 } },
+  ssj1: { hair: "ssj1", hairRamp: HAIR.gold, iris: "#1f9e8f", brows: true, outfit: "gi", build: "adult" },
+  ssj2: { hair: "ssj2", hairRamp: HAIR.paleGold, iris: "#1f9e8f", brows: true, outfit: "gi", build: "adult" },
+  ssj3: { hair: "ssj3", hairRamp: HAIR.gold, iris: "#1f9e8f", brows: false, outfit: "gi", build: "adult" },
+  ssj4: { hair: "ssj4", hairRamp: HAIR.black, iris: "#f4b938", brows: true, outfit: "fur", build: "adult", tail: true, eyeRing: "#c3262f" },
+  ssjg: { hair: "god", hairRamp: HAIR.crimson, iris: "#d3203b", brows: true, outfit: "gi", build: "slim" },
+  ssjb: { hair: "ssj1", hairRamp: HAIR.blue, iris: "#1aa9d6", brows: true, outfit: "gi", build: "adult" },
+  mui: { hair: "ui", hairRamp: HAIR.silver, iris: "#c9cdf2", brows: true, outfit: "gi", build: "adult" }
+};
+function anchorsFor(build) {
+  if (build === "kid") {
+    return {
+      cx: CX,
+      head: [CX, 50 + Y],
+      headR: [7.8, 8.2],
+      shoulderY: 60 + Y,
+      shoulderHalf: 11.5,
+      waistY: 73 + Y,
+      waistHalf: 8,
+      footY: 87 + Y,
+      stance: 7.5,
+      armR: 3,
+      k: 0.78,
+      hairScale: 0.98
+    };
+  }
+  const slim = build === "slim";
+  return {
+    cx: CX,
+    head: [CX, 38 + Y],
+    headR: [7.4, 7.8],
+    shoulderY: 49 + Y,
+    shoulderHalf: slim ? 13.5 : 15,
+    waistY: 66 + Y,
+    waistHalf: slim ? 9 : 10,
+    footY: 90 + Y,
+    stance: 11,
+    armR: slim ? 3.1 : 3.6,
+    k: 1,
+    hairScale: 1.16
+  };
+}
+var s = (bx, by, tx, ty, width, bend = 0) => ({
+  base: [bx, by],
+  tip: [tx, ty],
+  width: width * 1.2,
+  bend
+});
+function hairSculpt(style) {
+  const base = {
+    mass: { center: [0, -8], radius: [9, 5.2] },
+    front: [
+      s(-5, -9, -12, -22, 7, -1),
+      s(0, -10, 1, -24, 7, 1),
+      s(5, -9, 13, -21, 7, 1),
+      s(-7, -7, -20, -12, 7, -2),
+      s(-7, -4, -18, -1, 6, 2),
+      s(7, -7, 20, -13, 7, 2),
+      s(7, -4, 18, -2, 6, -2),
+      s(-6, -2, -15, 5, 5, 1),
+      s(-2, -10, -8, -25, 6, -1)
+    ],
+    bangs: [s(-3, -6, -8, -0.5, 5, 1), s(1, -6, -1, -1, 4), s(4, -6, 7, -0.5, 4, -1)],
+    back: [],
+    flutter: 0.5
+  };
+  switch (style) {
+    case "ssj1":
+      return {
+        mass: { center: [0, -8], radius: [9.5, 5.4] },
+        front: [
+          s(-6, -8, -17, -20, 8, -2),
+          s(-3, -10, -9, -27, 8, -1),
+          s(0, -10, 0, -30, 8),
+          s(3, -10, 9, -27, 8, 1),
+          s(6, -8, 17, -20, 8, 2),
+          s(-7, -5, -17, -9, 6, -1),
+          s(7, -5, 17, -9, 6, 1)
+        ],
+        bangs: [s(-2, -6, -5, 0, 4, 1), s(2, -6, 4, -1.5, 3.5)],
+        back: [],
+        flutter: 0.9
+      };
+    case "ssj2":
+      return {
+        mass: { center: [0, -8], radius: [9.5, 5.4] },
+        front: [
+          s(-6, -8, -19, -22, 6.5, -2),
+          s(-3, -10, -10, -29, 6.5, -1),
+          s(0, -10, 0, -32, 6.5),
+          s(3, -10, 10, -29, 6.5, 1),
+          s(6, -8, 19, -22, 6.5, 2),
+          s(-7, -5, -19, -10, 5, -1),
+          s(7, -5, 19, -10, 5, 1)
+        ],
+        bangs: [s(-1, -6, -3, 2.5, 2.6, 1)],
+        back: [],
+        flutter: 1
+      };
+    case "ssj3":
+      return {
+        mass: { center: [0, -8], radius: [9.5, 5.6] },
+        front: [
+          s(-4, -9, -11, -20, 8, -1),
+          s(0, -10, 0, -22, 8),
+          s(4, -9, 11, -20, 8, 1),
+          s(-7, -6, -15, -8, 6, -1),
+          s(7, -6, 15, -8, 6, 1)
+        ],
+        bangs: [s(-3, -6, -6, 1, 4, 1), s(3, -6, 6, 1, 4, -1)],
+        back: [
+          s(-9, -3, -26, 30, 11, -3),
+          s(-6, -5, -21, 44, 13, -3),
+          s(-2, -5, -10, 50, 13, -1),
+          s(2, -5, 10, 50, 13, 1),
+          s(6, -5, 21, 44, 13, 3),
+          s(9, -3, 26, 30, 11, 3)
+        ],
+        flutter: 1.1
+      };
+    case "ssj4":
+      return {
+        mass: { center: [0, -8], radius: [9.5, 5.4] },
+        front: [
+          s(-5, -9, -14, -20, 7, -1),
+          s(0, -10, -1, -22, 7, -1),
+          s(5, -9, 14, -19, 7, 1),
+          s(-7, -6, -19, -8, 6, -2),
+          s(7, -6, 19, -8, 6, 2)
+        ],
+        bangs: [s(-3, -6, -6, 1, 4, 1), s(2, -6, 4, 3.5, 3, -1)],
+        back: [
+          s(-7, -4, -16, 20, 10, -2),
+          s(-2, -5, -5, 26, 10, -1),
+          s(2, -5, 5, 26, 10, 1),
+          s(7, -4, 16, 20, 10, 2)
+        ],
+        flutter: 0.8
+      };
+    case "god":
+      return {
+        ...base,
+        front: base.front.map((spec) => ({ ...spec, width: spec.width - 1, tip: [spec.tip[0] * 0.92, spec.tip[1] + 1] })),
+        bangs: [s(-3, -6, -7, -0.5, 4.5, 1), s(3, -6, 6, -1, 3.5, -1)],
+        flutter: 0.6
+      };
+    case "ui":
+      return {
+        ...base,
+        front: base.front.map((spec) => ({ ...spec, tip: [spec.tip[0] * 0.95, spec.tip[1] - 4] })),
+        bangs: [s(-3, -6, -7, -2, 4.5, 1), s(3, -6, 6, -2.5, 3.5, -1)],
+        flutter: 0.7
+      };
+    default:
+      return base;
+  }
+}
+function hairPrims(specs, head, scale, t, flutter, seed) {
+  return specs.map((spec, index) => {
+    const phase = Math.PI * 2 * t + (index + seed) * 1.9;
+    const wobbleX = Math.sin(phase) * flutter;
+    const wobbleY = -Math.abs(Math.cos(phase * 0.5)) * flutter * 0.8;
+    const base = [head[0] + spec.base[0] * scale, head[1] + spec.base[1] * scale];
+    const tip = [head[0] + spec.tip[0] * scale + wobbleX, head[1] + spec.tip[1] * scale + wobbleY];
+    return spike(base, tip, spec.width * scale, (spec.bend ?? 0) * scale);
+  });
+}
+function mirror(cx, [x, y]) {
+  return [2 * cx - x, y];
+}
+function renderGokuFrame(formId, t, stage = 0) {
+  const style = FORM_STYLES[formId] ?? FORM_STYLES.base;
+  const a = anchorsFor(style.build);
+  const { cx, k } = a;
+  const tint = (r) => style.tint ? tintRamp(r, style.tint.color, style.tint.amount) : r;
+  const skin = tint(SKIN);
+  const gi = tint(GI);
+  const blue = tint(BLUE);
+  const hairGlow = style.hairRamp === HAIR.black ? tintRamp(style.hairRamp, "#7c8cff", 0.12 * stage) : tintRamp(style.hairRamp, "#ffffff", 0.13 * stage);
+  const hairRamp = tint(hairGlow);
+  const sleeveRamp = style.outfit === "fur" ? FUR : blue;
+  const armRamp = style.outfit === "fur" ? FUR : skin;
+  const pantsRamp = style.outfit === "fur" ? blue : gi;
+  const beltRamp = style.outfit === "fur" ? GOLD_BELT : blue;
+  const breath = Math.round(0.5 - 0.5 * Math.cos(Math.PI * 2 * t));
+  const nimbusBob = style.nimbus ? Math.round(Math.sin(Math.PI * 2 * t) * 0.8) : 0;
+  const up = (y) => y - breath + nimbusBob;
+  const low = (y) => y + nimbusBob;
+  const head = [a.head[0], up(a.head[1])];
+  const sY = up(a.shoulderY);
+  const wY = up(a.waistY);
+  const fY = low(a.footY);
+  const sh = a.shoulderHalf;
+  const wh = a.waistHalf;
+  const legScale = (a.footY - a.waistY) / 24;
+  const sculpt = hairSculpt(style.hair);
+  const hs = a.hairScale;
+  const back = [];
+  const parts = [];
+  const strokes = [];
+  const overlay = [];
+  if (sculpt.back.length > 0) {
+    back.push({ ramp: hairRamp, prims: hairPrims(sculpt.back, head, hs, t, sculpt.flutter, 3), bias: 1 });
+  }
+  if (style.pole) {
+    back.push({ ramp: POLE, prims: [capsule([cx + 12 * k, sY + 17 * k], [cx - 17 * k, sY - 7 * k], 1.5)] });
+  }
+  if (style.tail) {
+    const swing = Math.sin(Math.PI * 2 * t) * 2;
+    const root = [cx + wh - 2, wY + 3 * k];
+    const mid = [cx + wh + 7 * k, wY + 1 * k + swing * 0.5];
+    const tip = [cx + wh + 11 * k + swing * 0.4, wY - 8 * k + swing];
+    back.push({ ramp: style.outfit === "fur" ? FUR : TAIL, prims: [capsule(root, mid, 2 * k + 0.4), capsule(mid, tip, 2 * k + 0.4, 1.4)] });
+  }
+  const leg = (side) => {
+    const flip = (point) => side === 1 ? point : mirror(cx, point);
+    const ly = (dy) => wY + breath + dy * legScale;
+    const footX = cx - a.stance;
+    const pts = [
+      [cx - wh - 1, ly(2)],
+      [cx + 1, ly(2)],
+      [cx, ly(7)],
+      [cx - 3 * k, ly(13)],
+      [footX + 6 * k, fY - 6 * k],
+      [footX - 3.5 * k, fY - 6 * k],
+      [footX - 6.5 * k, ly(11)],
+      [cx - wh - 4 * k, ly(5)]
+    ].map((point) => flip(point));
+    const center = flip([footX + 1, ly(11)]);
+    parts.push({ ramp: pantsRamp, prims: [polygon(pts, center, 8 * k, 11 * k)] });
+    strokes.push({ points: [flip([footX - 2 * k, ly(8)]), flip([footX, ly(14)])], tone: 2 });
+    strokes.push({ points: [flip([cx - 4 * k, ly(10)]), flip([footX + 3 * k, ly(16)])], tone: 2 });
+    const boot = [
+      [footX - 4.5 * k, fY - 7 * k],
+      [footX + 4.5 * k, fY - 7 * k],
+      [footX + 4.5 * k, fY - 3 * k],
+      [footX + 7 * k, fY],
+      [footX - 5.5 * k, fY],
+      [footX - 5 * k, fY - 3 * k]
+    ].map((point) => flip(point));
+    parts.push({ ramp: tint(BOOT), prims: [polygon(boot, flip([footX - 1, fY - 5 * k]), 6 * k, 6 * k)] });
+    parts.push({
+      ramp: tint(BOOT),
+      prims: [capsule(flip([footX - 4 * k, fY - 7 * k]), flip([footX + 4 * k, fY - 7 * k]), 1.3 * k + 0.2)],
+      bias: -1
+    });
+  };
+  leg(1);
+  leg(-1);
+  const torso = [
+    [cx - sh, sY - 1],
+    [cx + sh, sY - 1],
+    [cx + sh - 1, sY + 7 * k],
+    [cx + wh + 1, wY],
+    [cx - wh - 1, wY],
+    [cx - sh + 1, sY + 7 * k]
+  ];
+  const neckTop = [cx, head[1] + 4 * k];
+  parts.push({ ramp: skin, prims: [capsule(neckTop, [cx, sY + 1], 4 * k + 0.4)], bias: 1 });
+  if (style.outfit === "fur") {
+    parts.push({ ramp: FUR, prims: [polygon(torso, [cx, sY + 6], sh, 12)] });
+    const chest = [
+      [cx - 8, sY + 1],
+      [cx + 8, sY + 1],
+      [cx + 6, wY - 1],
+      [cx - 6, wY - 1]
+    ];
+    parts.push({ ramp: skin, prims: [polygon(chest, [cx - 1, sY + 7], 9, 12)] });
+    strokes.push({ points: [[cx - 6, sY + 7], [cx - 1, sY + 8]], tone: 2 });
+    strokes.push({ points: [[cx + 1, sY + 8], [cx + 6, sY + 7]], tone: 2 });
+    strokes.push({ points: [[cx, sY + 9], [cx, wY - 2]], tone: 2 });
+    strokes.push({ points: [[cx - 3, sY + 12], [cx + 3, sY + 12]], tone: 2 });
+  } else {
+    parts.push({ ramp: gi, prims: [polygon(torso, [cx, sY + 6], sh, 12 * k)] });
+    const collar = 5 * (sh / 15);
+    parts.push({ ramp: blue, prims: [polygon([[cx - collar, sY - 1], [cx + collar, sY - 1], [cx, sY + 8 * k]], [cx, sY], 6, 8)] });
+    strokes.push({ points: [[cx - sh + 5, sY + 9 * k], [cx - 2, sY + 11 * k]], tone: 2 });
+    strokes.push({ points: [[cx + 2, sY + 11 * k], [cx + sh - 5, sY + 9 * k]], tone: 2 });
+  }
+  parts.push({
+    ramp: beltRamp,
+    prims: [polygon([[cx - wh - 1, wY - 1], [cx + wh + 1, wY - 1], [cx + wh + 1.5, wY + 3 * k], [cx - wh - 1.5, wY + 3 * k]], [cx, wY], wh + 2, 3)]
+  });
+  const sway = Math.sin(Math.PI * 2 * t + 0.6) * 1.5;
+  parts.push({
+    ramp: beltRamp,
+    prims: [
+      capsule([cx - wh + 1, wY + 2], [cx - wh - 1 + sway, wY + 10 * k], 1.6 * k + 0.2, 1),
+      capsule([cx - wh + 3, wY + 2], [cx - wh + 2.5 + sway * 1.3, wY + 9 * k], 1.5 * k + 0.2, 0.9)
+    ]
+  });
+  const arm = (side) => {
+    const flip = (point) => side === 1 ? point : mirror(cx, point);
+    const shoulder = flip([cx - sh + 1, sY + 2]);
+    const elbow = flip([cx - sh - 4.5 * k, sY + 12 * k]);
+    const wrist = flip([cx - sh - 1.5 * k, sY + 20 * k]);
+    const fist = flip([cx - sh - 0.8 * k, sY + 22.6 * k]);
+    const band = [elbow[0] + (wrist[0] - elbow[0]) * 0.62, elbow[1] + (wrist[1] - elbow[1]) * 0.62];
+    parts.push({ ramp: armRamp, prims: [capsule(shoulder, elbow, a.armR + 0.3, a.armR), capsule(elbow, wrist, a.armR - 0.1, a.armR - 0.5)] });
+    const sleeveEnd = [shoulder[0] + (elbow[0] - shoulder[0]) * 0.38, shoulder[1] + (elbow[1] - shoulder[1]) * 0.38];
+    parts.push({ ramp: sleeveRamp, prims: [capsule([shoulder[0] + side * 0.5, shoulder[1] - 0.5], sleeveEnd, a.armR + 0.9, a.armR + 0.4)] });
+    parts.push({ ramp: style.outfit === "fur" ? ramp("#ffffff", "#e8ecf4", "#b7bfd4", "#7f88a6") : blue, prims: [capsule(band, wrist, a.armR + 0.1)] });
+    const fistRx = 3.4 * k + 0.3;
+    const fistRy = 3.1 * k + 0.3;
+    const thumbSide = fist[0] < cx ? 1 : -1;
+    parts.push({
+      ramp: skin,
+      prims: [
+        ellipse(fist[0], fist[1], fistRx, fistRy),
+        ellipse(fist[0] + thumbSide * fistRx * 0.5, fist[1] + fistRy * 0.5, fistRx * 0.55, fistRy * 0.45)
+      ]
+    });
+    const knuckleY = Math.round(fist[1] - fistRy * 0.2);
+    strokes.push({ points: [[fist[0] - fistRx + 1, knuckleY], [fist[0] + fistRx - 1, knuckleY]], tone: 2 });
+    strokes.push({ points: [[Math.round(fist[0] - thumbSide), knuckleY + 1], [Math.round(fist[0] - thumbSide), knuckleY + 2]], tone: 3 });
+  };
+  arm(1);
+  arm(-1);
+  const [hx, hy] = head;
+  const earR = [1.7 * k + 0.4, 2.4 * k + 0.4];
+  parts.push({ ramp: skin, prims: [ellipse(hx - a.headR[0] - 0.3, hy + 1, earR[0], earR[1]), ellipse(hx + a.headR[0] + 0.3, hy + 1, earR[0], earR[1])], bias: 1 });
+  parts.push({ ramp: skin, prims: [ellipse(hx, hy - 0.5, a.headR[0], a.headR[1]), ellipse(hx, hy + 4.5 * k, a.headR[0] * 0.78, 5 * k)] });
+  const hairFront = [
+    ellipse(hx + sculpt.mass.center[0] * hs, hy + sculpt.mass.center[1] * hs, sculpt.mass.radius[0] * hs, sculpt.mass.radius[1] * hs),
+    ...hairPrims(sculpt.front, head, hs, t, sculpt.flutter, 0),
+    // Kid bangs stop above the eyes so the big eyes stay readable.
+    ...hairPrims(
+      style.build === "kid" ? sculpt.bangs.map((spec) => ({ ...spec, tip: [spec.tip[0], spec.tip[1] - 3] })) : sculpt.bangs,
+      head,
+      hs,
+      t,
+      sculpt.flutter * 0.4,
+      7
+    )
+  ];
+  parts.push({ ramp: hairRamp, prims: hairFront });
+  if (style.nimbus) {
+    const cloudY = fY + 2;
+    parts.push({
+      ramp: NIMBUS,
+      prims: [
+        ellipse(cx - 12, cloudY + 1, 7, 4),
+        ellipse(cx - 3, cloudY - 1, 8, 4.6),
+        ellipse(cx + 7, cloudY, 8, 4.4),
+        ellipse(cx + 16, cloudY + 2, 6, 3.4),
+        ellipse(cx - 20, cloudY + 3, 4.5, 2.6)
+      ]
     });
   }
-  return tracks;
+  const fx = Math.round(hx);
+  const fy = Math.round(hy);
+  const lash = style.eyeRing ?? "#2a1418";
+  const browColor = style.hair === "base" || style.hair === "god" || style.hair === "ssj4" ? hairRamp.tones[3] : hairRamp.tones[2];
+  const dot = (dx, dy, color) => {
+    overlay.push({ x: fx + dx, y: fy + dy, color });
+    overlay.push({ x: fx - dx - 1, y: fy + dy, color });
+  };
+  const lipLine = "#5e2a28";
+  if (style.build === "kid") {
+    if (style.brows) for (const [dx, dy] of [[-6, -3], [-5, -3], [-4, -3], [-3, -2]]) dot(dx, dy, browColor);
+    for (const dx of [-6, -5, -4, -3]) dot(dx, -1, lash);
+    dot(-6, 0, "#ffffff");
+    dot(-5, 0, "#ffffff");
+    dot(-4, 0, style.iris);
+    dot(-3, 0, style.iris);
+    dot(-6, 1, lash);
+    dot(-5, 1, style.iris);
+    dot(-4, 1, style.iris);
+    dot(-3, 1, "#ffffff");
+    dot(-5, 2, skin.tones[2]);
+    dot(-4, 2, skin.tones[2]);
+    overlay.push({ x: fx - 1, y: fy + 3, color: skin.tones[2] });
+    overlay.push({ x: fx, y: fy + 4, color: skin.tones[3] });
+    overlay.push({ x: fx - 2, y: fy + 6, color: lipLine });
+    overlay.push({ x: fx - 1, y: fy + 6, color: lipLine });
+    overlay.push({ x: fx, y: fy + 6, color: lipLine });
+    overlay.push({ x: fx + 1, y: fy + 6, color: lipLine });
+    overlay.push({ x: fx - 1, y: fy + 7, color: skin.tones[2] });
+    overlay.push({ x: fx, y: fy + 7, color: skin.tones[2] });
+  } else {
+    const browPixels = [[-6, -3], [-5, -3], [-5, -2], [-4, -2], [-3, -2], [-3, -1], [-2, -1]];
+    for (const [dx, dy] of browPixels) dot(dx, dy, style.brows ? browColor : skin.tones[3]);
+    if (!style.brows) dot(-4, -2, skin.tones[2]);
+    for (const dx of [-5, -4, -3, -2]) dot(dx, 0, lash);
+    dot(-5, 1, "#ffffff");
+    dot(-4, 1, "#ffffff");
+    dot(-3, 1, style.iris);
+    dot(-2, 1, lash);
+    dot(-4, 2, skin.tones[2]);
+    dot(-3, 2, skin.tones[2]);
+    if (style.eyeRing) {
+      dot(-6, 0, style.eyeRing);
+      dot(-6, 1, style.eyeRing);
+      dot(-5, 2, style.eyeRing);
+    }
+    overlay.push({ x: fx - 1, y: fy - 1, color: skin.tones[2] });
+    overlay.push({ x: fx, y: fy - 1, color: skin.tones[2] });
+    overlay.push({ x: fx - 1, y: fy + 3, color: skin.tones[2] });
+    overlay.push({ x: fx, y: fy + 3, color: skin.tones[3] });
+    overlay.push({ x: fx, y: fy + 4, color: skin.tones[3] });
+    for (const dx of [-2, -1, 0, 1]) overlay.push({ x: fx + dx, y: fy + 6, color: lipLine });
+    overlay.push({ x: fx - 1, y: fy + 7, color: skin.tones[2] });
+    overlay.push({ x: fx, y: fy + 7, color: skin.tones[2] });
+    dot(-4, 4, skin.tones[2]);
+  }
+  return rasterize(CANVAS_WIDTH, CANVAS_HEIGHT, [...back, ...parts], strokes, overlay);
 }
-function generateKiAuraParticles(timeProgress, centerX, centerY, particleCount, primaryColor, coreColor) {
+
+// src/art/effects.ts
+var AURA_SHAPE = {
+  calm: { reach: 1.4, rise: 2.5, alpha: 0.35 },
+  flaring: { reach: 2.4, rise: 8, alpha: 0.5 },
+  super: { reach: 3.2, rise: 11, alpha: 0.58 },
+  hyper: { reach: 4, rise: 15, alpha: 0.66 }
+};
+var TAU = Math.PI * 2;
+function hash(n) {
+  const value = Math.sin(n * 12.9898 + 78.233) * 43758.5453;
+  return value - Math.floor(value);
+}
+function distanceField(mask, width, height) {
+  const far = width + height;
+  const distance = new Float32Array(width * height);
+  for (let i = 0; i < distance.length; i++) distance[i] = mask[i] ? 0 : far;
+  const diagonal = Math.SQRT2;
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const i = y * width + x;
+      if (x > 0) distance[i] = Math.min(distance[i], distance[i - 1] + 1);
+      if (y > 0) {
+        distance[i] = Math.min(distance[i], distance[i - width] + 1);
+        if (x > 0) distance[i] = Math.min(distance[i], distance[i - width - 1] + diagonal);
+        if (x < width - 1) distance[i] = Math.min(distance[i], distance[i - width + 1] + diagonal);
+      }
+    }
+  }
+  for (let y = height - 1; y >= 0; y--) {
+    for (let x = width - 1; x >= 0; x--) {
+      const i = y * width + x;
+      if (x < width - 1) distance[i] = Math.min(distance[i], distance[i + 1] + 1);
+      if (y < height - 1) {
+        distance[i] = Math.min(distance[i], distance[i + width] + 1);
+        if (x < width - 1) distance[i] = Math.min(distance[i], distance[i + width + 1] + diagonal);
+        if (x > 0) distance[i] = Math.min(distance[i], distance[i + width - 1] + diagonal);
+      }
+    }
+  }
+  return distance;
+}
+function bounds(mask, width, height) {
+  let minX = width;
+  let maxX = 0;
+  let minY = height;
+  let maxY = 0;
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      if (!mask[y * width + x]) continue;
+      minX = Math.min(minX, x);
+      maxX = Math.max(maxX, x);
+      minY = Math.min(minY, y);
+      maxY = Math.max(maxY, y);
+    }
+  }
+  return { minX, maxX, minY, maxY, cx: (minX + maxX) / 2 };
+}
+function composeFrame(character, style, t, frameIndex, stage = 0) {
+  const { width, height } = character;
+  const mask = alphaMask(character);
+  const distance = distanceField(mask, width, height);
+  const box = bounds(mask, width, height);
+  const base = AURA_SHAPE[style.intensity];
+  const grow = 1 + 0.2 * stage;
+  const shape = { reach: base.reach * grow, rise: base.rise * grow, alpha: Math.min(0.8, base.alpha + 0.05 * stage) };
+  const frame = createImage(width, height);
+  const sample = (x, y) => y < 0 || y >= height ? Infinity : distance[Math.min(height - 1, Math.round(y)) * width + x];
+  for (let y = 0; y < height; y++) {
+    if (y > box.maxY - 1) break;
+    for (let x = 0; x < width; x++) {
+      const index = y * width + x;
+      if (mask[index]) continue;
+      const column = 0.5 + 0.5 * Math.sin(x * 0.83 + 1.7 * Math.sin(x * 0.29 + TAU * t));
+      const wave = 0.6 + 0.4 * Math.sin(y * 0.5 + 2 * TAU * t + x * 0.3);
+      const lift = shape.rise * (0.3 + 0.7 * column) * wave;
+      const groundFade = y > box.maxY - 6 ? 0.45 : 1;
+      const topFade = Math.min(1, (y + 1) / 14);
+      const outer = sample(x, y + lift) <= shape.reach + 1.2;
+      const inner = sample(x, y + lift * 0.55) <= shape.reach * 0.55;
+      const core = sample(x, y + lift * 0.3) <= shape.reach * 0.3 && style.intensity !== "calm";
+      if (core) {
+        blendPixel(frame, x, y, style.core, 0.7 * groundFade * topFade);
+      } else if (inner) {
+        blendPixel(frame, x, y, style.primary, Math.min(1, shape.alpha + 0.25) * groundFade * topFade);
+      } else if (outer) {
+        const outerColor = style.intensity === "calm" ? style.primary : style.secondary;
+        blendPixel(frame, x, y, outerColor, shape.alpha * groundFade * topFade);
+      }
+    }
+  }
   const particles = [];
-  for (let i = 0; i < particleCount; i++) {
-    const phase = (i / particleCount + timeProgress) % 1;
-    const y = centerY + 50 - phase * 90;
-    const spreadX = (1 - phase * 0.4) * 45;
-    const angle = i * 2.39996;
-    const x = centerX + Math.sin(angle + timeProgress * 6) * spreadX;
-    const radius = Math.max(1, Math.round(2 + Math.sin(phase * Math.PI) * 4));
-    const opacity = Number((Math.sin(phase * Math.PI) * 0.85).toFixed(2));
+  for (let i = 0; i < style.particles; i++) {
+    const phase = (hash(i) + t * (1 + i % 2)) % 1;
+    const spread = (box.maxX - box.minX) / 2 + 8;
+    const x = Math.round(box.cx + (hash(i + 31) * 2 - 1) * spread + Math.sin(TAU * (phase + hash(i + 7))) * 2);
+    const y = Math.round(box.maxY - phase * (box.maxY - box.minY + 10));
     particles.push({
-      x: Math.round(x),
-      y: Math.round(y),
-      radius,
-      opacity,
-      color: i % 3 === 0 ? coreColor : primaryColor
+      x,
+      y,
+      size: hash(i + 13) > 0.6 ? 2 : 1,
+      alpha: Math.sin(Math.PI * phase),
+      front: i % 3 === 0
     });
   }
-  return particles;
+  const drawParticle = (particle) => {
+    for (let dy = 0; dy < particle.size; dy++) {
+      for (let dx = 0; dx < particle.size; dx++) {
+        blendPixel(frame, particle.x + dx, particle.y + dy, style.core, Math.min(1, particle.alpha * 1.1));
+      }
+    }
+  };
+  particles.filter((particle) => !particle.front).forEach(drawParticle);
+  drawImage(frame, character);
+  if (stage > 0) {
+    const rimLimit = stage >= 2 ? box.maxY : box.minY + (box.maxY - box.minY) * 0.45;
+    const pulse = 0.75 + 0.25 * Math.sin(TAU * t);
+    for (let y = box.minY - 2; y <= rimLimit; y++) {
+      for (let x = Math.max(0, box.minX - 2); x <= Math.min(width - 1, box.maxX + 2); x++) {
+        if (y < 0 || y >= height) continue;
+        const index = y * width + x;
+        if (!mask[index] && distance[index] <= 1.2) {
+          blendPixel(frame, x, y, style.core, (stage >= 2 ? 0.85 : 0.6) * pulse);
+        }
+      }
+    }
+  }
+  particles.filter((particle) => particle.front).forEach(drawParticle);
+  for (let s2 = 0; s2 < style.sparks; s2++) {
+    if ((frameIndex + s2 * 3) % 4 > 1) continue;
+    const seed = frameIndex * 17 + s2 * 101;
+    const startX = box.cx + (hash(seed) * 2 - 1) * ((box.maxX - box.minX) / 2 + 2);
+    const startY = box.minY + 6 + hash(seed + 1) * (box.maxY - box.minY) * 0.6;
+    const direction = startX < box.cx ? -1 : 1;
+    const points = [[startX, startY]];
+    for (let segment = 0; segment < 4; segment++) {
+      const [px, py] = points[points.length - 1];
+      const zig = segment % 2 === 0 ? 1 : -1;
+      points.push([
+        px + direction * zig * (1.5 + hash(seed + segment * 3 + 2) * 2.5),
+        py - (2 + hash(seed + segment * 3 + 3) * 3)
+      ]);
+    }
+    for (let segment = 0; segment < points.length - 1; segment++) {
+      forLine(points[segment], points[segment + 1], (x, y) => {
+        blendPixel(frame, x, y, style.spark, 1);
+      });
+    }
+    for (const [px, py] of points.slice(1, -1)) blendPixel(frame, Math.round(px), Math.round(py), "#ffffff", 1);
+  }
+  return frame;
 }
-function generateLightningArcs(timeProgress, centerX, centerY, sparkCount, sparkColor = "#38bdf8") {
-  const arcs = [];
-  if (sparkCount <= 0) return arcs;
-  for (let s = 0; s < sparkCount; s++) {
-    const cycle = (timeProgress * 4 + s * 0.25) % 1;
-    if (cycle > 0.45) continue;
-    const angle = s * (Math.PI / 2) + timeProgress * 2;
-    const startX = centerX + Math.cos(angle) * 35;
-    const startY = centerY + Math.sin(angle) * 35;
-    const midX = startX + (Math.sin(s * 13) > 0 ? 12 : -12);
-    const midY = startY - 14;
-    const endX = midX + (Math.cos(s * 7) > 0 ? 10 : -10);
-    const endY = midY - 12;
-    arcs.push({
-      points: [
-        [Math.round(startX), Math.round(startY)],
-        [Math.round(midX), Math.round(midY)],
-        [Math.round(endX), Math.round(endY)]
-      ],
-      color: sparkColor,
-      width: 1.5
-    });
+
+// src/art/index.ts
+var FRAME_COUNT = 8;
+var FRAME_DELAY_MS = 110;
+var DISPLAY_SCALE = 2;
+var FEET_Y = GROUND;
+var cache = /* @__PURE__ */ new Map();
+function renderCharacterFrames(form, aura, stage = 0) {
+  const key = `${form.id}:${stage}:${aura.intensity}:${aura.particleCount}:${aura.sparkCount}`;
+  const cached = cache.get(key);
+  if (cached) return cached;
+  const style = {
+    intensity: aura.intensity,
+    primary: form.auraColors.primary,
+    secondary: form.auraColors.secondary,
+    core: form.auraColors.core,
+    spark: form.sparkColor ?? "#7dd3fc",
+    particles: aura.particleCount,
+    sparks: aura.sparkCount
+  };
+  const frames = [];
+  for (let index = 0; index < FRAME_COUNT; index++) {
+    const t = index / FRAME_COUNT;
+    frames.push(composeFrame(renderGokuFrame(form.id, t, stage), style, t, index, stage));
   }
-  return arcs;
+  cache.set(key, frames);
+  return frames;
+}
+
+// src/art/png.ts
+var import_node_zlib = require("zlib");
+var CRC_TABLE = (() => {
+  const table = new Uint32Array(256);
+  for (let n = 0; n < 256; n++) {
+    let c = n;
+    for (let k = 0; k < 8; k++) c = c & 1 ? 3988292384 ^ c >>> 1 : c >>> 1;
+    table[n] = c >>> 0;
+  }
+  return table;
+})();
+function crc32(bytes) {
+  let crc = 4294967295;
+  for (const byte of bytes) crc = CRC_TABLE[(crc ^ byte) & 255] ^ crc >>> 8;
+  return (crc ^ 4294967295) >>> 0;
+}
+function chunk(type, data) {
+  const header = Buffer.alloc(8);
+  header.writeUInt32BE(data.length, 0);
+  header.write(type, 4, "ascii");
+  const body = Buffer.concat([header.subarray(4), Buffer.from(data)]);
+  const crc = Buffer.alloc(4);
+  crc.writeUInt32BE(crc32(body), 0);
+  return Buffer.concat([header.subarray(0, 4), body, crc]);
+}
+function encodePng(image, scale = 1) {
+  const factor = Math.max(1, Math.floor(scale));
+  const width = image.width * factor;
+  const height = image.height * factor;
+  const raw = Buffer.alloc((width * 4 + 1) * height);
+  for (let y = 0; y < height; y++) {
+    const rowStart = y * (width * 4 + 1);
+    raw[rowStart] = 0;
+    const sourceY = Math.floor(y / factor);
+    for (let x = 0; x < width; x++) {
+      const source = (sourceY * image.width + Math.floor(x / factor)) * 4;
+      const target = rowStart + 1 + x * 4;
+      raw[target] = image.data[source];
+      raw[target + 1] = image.data[source + 1];
+      raw[target + 2] = image.data[source + 2];
+      raw[target + 3] = image.data[source + 3];
+    }
+  }
+  const ihdr = Buffer.alloc(13);
+  ihdr.writeUInt32BE(width, 0);
+  ihdr.writeUInt32BE(height, 4);
+  ihdr[8] = 8;
+  ihdr[9] = 6;
+  ihdr[10] = 0;
+  ihdr[11] = 0;
+  ihdr[12] = 0;
+  return Buffer.concat([
+    Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]),
+    chunk("IHDR", ihdr),
+    chunk("IDAT", (0, import_node_zlib.deflateSync)(raw, { level: 9 })),
+    chunk("IEND", new Uint8Array(0))
+  ]);
 }
 
 // src/renderer/svg.ts
 var CARD_WIDTH = 500;
-var CARD_HEIGHT = 280;
-var ORBIT = { centerX: 250, centerY: 132, radiusX: 188, radiusY: 52 };
+var CARD_HEIGHT = 300;
+var ORBIT = { centerX: 250, centerY: 172, radiusX: 168, radiusY: 42 };
+var GROUND_Y = 266;
+var HORIZON_Y = 236;
+var BALL_SCALE = 1.3;
+var FONT = "'Segoe UI', system-ui, -apple-system, Helvetica, Arial, sans-serif";
 function escapeXml(value) {
   return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&apos;");
 }
@@ -21904,7 +22442,7 @@ function renderDragonBall(ball, index) {
     const y = ORBIT.centerY + ORBIT.radiusY * Math.sin(angle);
     const depth = (Math.sin(angle) + 1) / 2;
     translateValues.push(`${x.toFixed(1)},${y.toFixed(1)}`);
-    scaleValues.push((0.85 + 0.3 * depth).toFixed(2));
+    scaleValues.push(((0.85 + 0.3 * depth) * BALL_SCALE).toFixed(2));
     opacityValues.push((ball.isUnlocked ? 0.75 + 0.25 * depth : 0.12).toFixed(2));
   }
   const [startX, startY] = translateValues[0].split(",");
@@ -21925,214 +22463,162 @@ function renderDragonBall(ball, index) {
   </g>`;
 }
 function renderSvg(stats) {
-  const skin = getSkin(stats.skinId || "goku");
-  const effectiveContributions = stats.peakContributions ?? stats.totalContributions;
-  const { currentForm, nextForm, progressPercent, contributionsToNext } = calculateFormProgression(effectiveContributions, skin.id);
-  const aura = calculateAuraFromStreak(stats.currentStreak, currentForm.hasSparks);
-  const unlockedBalls = stats.unlockedBalls ?? calculateUnlockedBalls(effectiveContributions);
-  const dragonBalls = calculateDragonBalls(unlockedBalls, 0, ORBIT);
+  const card = buildCardModel(stats, 0, ORBIT);
+  const { currentForm, nextForm, progressPercent, contributionsToNext, aura, unlockedBalls, nextBall, stage, eta, streak } = card;
+  const dragonBalls = card.dragonBalls;
   const indexedBalls = dragonBalls.map((ball, index) => ({ ball, index }));
   const backBalls = indexedBalls.filter(({ ball }) => ball.z < 0);
   const frontBalls = indexedBalls.filter(({ ball }) => ball.z >= 0);
-  const nextBall = nextDragonBallMilestone(effectiveContributions);
-  const bestStreak = stats.bestStreak ?? stats.longestStreak;
-  const skinSprite = getSkinSprite(skin.id, currentForm);
-  const gokuScale = 4;
-  const gokuX = 250 - skinSprite.width * gokuScale / 2;
-  const gokuY = 116 - skinSprite.height * gokuScale / 2;
   const primaryAura = currentForm.auraColors.primary;
-  const coreAura = currentForm.auraColors.core;
-  const particleTracks = generateParticleTracks(
-    aura.particleCount,
-    ORBIT.centerX,
-    ORBIT.centerY,
-    primaryAura,
-    coreAura
-  );
-  const particlesSvg = particleTracks.map((track) => {
-    const begin = track.delay > 0 ? `-${track.delay}s` : "0s";
-    return `<circle cx="${track.x0}" cy="${track.y0}" r="${track.r0}" fill="${track.color}" opacity="0">
-        <animate attributeName="cy" values="${track.y0};${track.y1}" dur="${track.duration}s" begin="${begin}" repeatCount="indefinite" calcMode="linear" />
-        <animate attributeName="cx" values="${track.x0};${track.x1}" dur="${track.duration}s" begin="${begin}" repeatCount="indefinite" calcMode="linear" />
-        <animate attributeName="r" values="${track.r0};${track.r1};0" dur="${track.duration}s" begin="${begin}" repeatCount="indefinite" calcMode="linear" />
-        <animate attributeName="opacity" values="0;0.85;0" dur="${track.duration}s" begin="${begin}" repeatCount="indefinite" calcMode="linear" />
-      </circle>`;
-  }).join("");
-  const lightning = generateLightningArcs(
-    0.1,
-    ORBIT.centerX,
-    120,
-    aura.sparkCount,
-    currentForm.sparkColor || "#38bdf8"
-  );
-  const lightningSvg = lightning.map((arc, index) => {
-    const points = arc.points.map((point) => `${point[0]},${point[1]}`).join(" ");
-    return `<polyline points="${points}" fill="none" stroke="${arc.color}" stroke-width="${arc.width}" stroke-linecap="round" class="lightning" opacity="0.9">
-        <animate attributeName="opacity" values="0.95;0.1;0.95" dur="0.45s" begin="-${(index * 0.11).toFixed(2)}s" repeatCount="indefinite" />
-      </polyline>`;
-  }).join("");
+  const frames = renderCharacterFrames(currentForm, aura, stage);
+  const spriteWidth = CANVAS_WIDTH * DISPLAY_SCALE;
+  const spriteHeight = CANVAS_HEIGHT * DISPLAY_SCALE;
+  const spriteX = 250 - spriteWidth / 2;
+  const spriteY = GROUND_Y - FEET_Y * DISPLAY_SCALE;
+  const duration = (FRAME_COUNT * FRAME_DELAY_MS / 1e3).toFixed(2);
+  const keyTimes = frames.map((_, index) => (index / FRAME_COUNT).toFixed(4)).join(";");
+  const frameImage = (index, attributes) => `<image x="0" y="0" width="${spriteWidth}" height="${spriteHeight}" preserveAspectRatio="none" style="image-rendering:pixelated" ${attributes} href="data:image/png;base64,${encodePng(frames[index], DISPLAY_SCALE).toString("base64")}" />`;
+  const characterSvg = `<g transform="translate(${spriteX},${spriteY})">
+    ${frames.map((_, index) => {
+    const values = frames.map((__, step) => step === index ? "1" : "0").join(";");
+    return frameImage(index, `class="ki-frame" opacity="${index === 0 ? 1 : 0}"`).replace(
+      " />",
+      `><animate attributeName="opacity" values="${values}" keyTimes="${keyTimes}" dur="${duration}s" calcMode="discrete" repeatCount="indefinite" /></image>`
+    );
+  }).join("\n    ")}
+    ${frameImage(0, 'class="ki-still"')}
+  </g>`;
   const activityBlocks = stats.recentDays.map((day, index) => {
-    const x = 316 + index * 11;
+    const x = 16 + index * 9;
     const intensity = Math.min(day.count, 6);
     const height = 4 + intensity * 2;
-    const y = 256 - height;
-    const color = day.count > 0 ? day.count > 3 ? "#22c55e" : "#15803d" : "#334155";
-    return `<rect class="ki-bar" x="${x}" y="${y}" width="8" height="${height}" rx="1.5" fill="${color}" />`;
+    const y = 286 - height;
+    const color = day.count > 0 ? day.count > 3 ? "#fde047" : "#ca8a04" : "#2a2050";
+    return `<rect class="ki-bar" x="${x}" y="${y}" width="8" height="${height}" rx="1" fill="${color}" />`;
   }).join("");
-  const progressWidth = Math.round(progressPercent / 100 * 120);
-  const nextLabel = nextForm ? `NEXT: ${nextForm.name}` : "MAX FORM";
-  const relicWord = skin.relic.short.replace(/S$/, "");
-  const ballsLabel = `${skin.relic.short} ${unlockedBalls}/7`;
-  const relicLabel = nextBall ? `next ${relicWord.toLowerCase()} ${nextBall.star}\u2605 at ${formatCompact(nextBall.at)}` : `all 7 ${skin.relic.plural.toLowerCase()} summoned`;
-  const subtitle = `${currentForm.title} \xB7 ${relicLabel}`;
+  const hpWidth = 190;
+  const hpFill = Math.round(progressPercent / 100 * hpWidth);
+  const hpNotches = [1 / 3, 2 / 3].map((fraction) => {
+    const x = 14 + Math.round(fraction * hpWidth);
+    return `<line x1="${x}" y1="44" x2="${x - 4}" y2="56" stroke="#0b0820" stroke-width="1.5" />`;
+  }).join("");
+  const stagePips = [0, 1, 2].map((index) => `<rect x="${446 + index * 13}" y="270" width="10" height="10" rx="2" fill="${index <= stage ? primaryAura : "#2a2050"}" />`).join("");
+  const nextLine = nextForm ? `NEXT \u25B8 ${nextForm.name} \xB7 +${contributionsToNext.toLocaleString("en-US")} \xB7 ${eta?.long ?? ""}` : "FINAL FORM REACHED";
+  const ballsLine = nextBall ? `NEXT BALL ${nextBall.star}\u2605 AT ${formatCompact(nextBall.at)} THIS YEAR` : "ALL 7 \xB7 SHENRON SUMMONED THIS YEAR";
+  const floorLines = Array.from({ length: 9 }, (_, index) => {
+    const x = -200 + index * 112;
+    return `<line x1="250" y1="${HORIZON_Y}" x2="${x}" y2="300" stroke="${primaryAura}" stroke-opacity="0.18" />`;
+  }).join("");
   const username = escapeXml(stats.username);
   const joined = stats.joinedYear ? ` \xB7 since ${stats.joinedYear}` : "";
-  return `<svg width="${CARD_WIDTH}" height="${CARD_HEIGHT}" viewBox="0 0 ${CARD_WIDTH} ${CARD_HEIGHT}" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="saiyan-title saiyan-desc">
+  return `<svg width="${CARD_WIDTH}" height="${CARD_HEIGHT}" viewBox="0 0 ${CARD_WIDTH} ${CARD_HEIGHT}" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="saiyan-title saiyan-desc" font-family="${FONT}">
   <title id="saiyan-title">${username}'s git-saiyan card</title>
-  <desc id="saiyan-desc">${escapeXml(currentForm.name)} with ${unlockedBalls} of 7 ${escapeXml(skin.relic.plural)}, a ${stats.currentStreak} day streak, and power level ${stats.powerLevel}.</desc>
+  <desc id="saiyan-desc">${escapeXml(currentForm.name)} with ${unlockedBalls} of 7 Dragon Balls this year, a ${streak.current} ${streak.noun} streak, power-up stage ${stage + 1} of 3, and power level ${stats.powerLevel}.</desc>
   <defs>
-    <linearGradient id="bg-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#090d16" />
-      <stop offset="50%" stop-color="#0d1117" />
-      <stop offset="100%" stop-color="#050811" />
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0b0820" />
+      <stop offset="0.75" stop-color="#1a1035" />
+      <stop offset="1" stop-color="#0b0820" />
     </linearGradient>
-    <radialGradient id="ki-flare" cx="50%" cy="50%" r="50%">
-      <stop offset="0%" stop-color="${primaryAura}" stop-opacity="0.35" />
-      <stop offset="50%" stop-color="${coreAura}" stop-opacity="0.12" />
-      <stop offset="100%" stop-color="${primaryAura}" stop-opacity="0" />
+    <radialGradient id="spotlight" cx="50%" cy="80%" r="55%">
+      <stop offset="0" stop-color="${primaryAura}" stop-opacity="0.35" />
+      <stop offset="1" stop-color="${primaryAura}" stop-opacity="0" />
     </radialGradient>
-    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
-      <feGaussianBlur stdDeviation="3" result="blur" />
-      <feComposite in="SourceGraphic" in2="blur" operator="over" />
-    </filter>
+    <linearGradient id="hp" x1="0" x2="1">
+      <stop offset="0" stop-color="#fde047" />
+      <stop offset="1" stop-color="${primaryAura}" />
+    </linearGradient>
+    <clipPath id="card-clip"><rect x="1" y="1" width="${CARD_WIDTH - 2}" height="${CARD_HEIGHT - 2}" rx="14" /></clipPath>
     <style>
-      @keyframes float {
-        0%, 100% { transform: translateY(0px); }
-        50% { transform: translateY(-3px); }
-      }
-      @keyframes pulseAura {
-        0%, 100% { opacity: 0.25; transform: scale(1.0); }
-        50% { opacity: 0.5; transform: scale(1.06); }
-      }
-      @keyframes sparkFlicker {
-        0%, 100% { opacity: 0.9; }
-        50% { opacity: 0.1; }
-      }
-      .goku-stance {
-        animation: float 2.8s ease-in-out infinite;
-        transform-origin: center;
-      }
-      .aura-glow {
-        animation: pulseAura ${(2 / aura.pulseSpeed).toFixed(2)}s ease-in-out infinite;
-        transform-origin: 250px 120px;
-      }
-      .font-tech {
-        font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
-      }
+      .ki-still { display: none; }
       @media (prefers-reduced-motion: reduce) {
-        .goku-stance, .aura-glow, .lightning { animation: none; }
+        .ki-frame { display: none; }
+        .ki-still { display: inline; }
       }
     </style>
   </defs>
 
-  <rect x="2" y="2" width="${CARD_WIDTH - 4}" height="${CARD_HEIGHT - 4}" rx="14" fill="url(#bg-grad)" stroke="#1e293b" stroke-width="1.5" />
+  <g clip-path="url(#card-clip)">
+    <rect width="${CARD_WIDTH}" height="${CARD_HEIGHT}" fill="url(#sky)" />
+    <ellipse cx="250" cy="250" rx="260" ry="120" fill="url(#spotlight)" />
+    <rect x="0" y="${HORIZON_Y}" width="${CARD_WIDTH}" height="${CARD_HEIGHT - HORIZON_Y}" fill="#120c26" />
+    ${floorLines}
+    <line x1="0" y1="${HORIZON_Y}" x2="${CARD_WIDTH}" y2="${HORIZON_Y}" stroke="${primaryAura}" stroke-opacity="0.45" />
+    <ellipse cx="250" cy="${GROUND_Y - 2}" rx="62" ry="8" fill="#000000" opacity="0.45" />
 
-  <path d="M 12 24 L 24 12" stroke="#334155" stroke-width="2" />
-  <path d="M 488 24 L 476 12" stroke="#334155" stroke-width="2" />
-
-  <g class="font-tech">
-    <path d="M 21 21 L 15 31 L 20 31 L 17 41 L 27 29 L 22 29 Z" fill="#f59e0b" />
-    <text x="32" y="34" fill="#f59e0b" font-size="13" font-weight="800" letter-spacing="1.5">GIT-SAIYAN</text>
-    <text x="150" y="34" fill="#64748b" font-size="11">| ${escapeXml(currentForm.saga)}</text>
-
-    <text x="24" y="50" fill="#64748b" font-size="9">@${username}${joined}</text>
-
-    <rect x="365" y="18" width="112" height="22" rx="4" fill="#1e1b4b" stroke="#4338ca" stroke-width="1" />
-    <text x="421" y="33" fill="#a5b4fc" font-size="10" font-weight="700" text-anchor="middle">PL: ${stats.powerLevel.toLocaleString("en-US")}</text>
-    <text x="421" y="50" fill="#64748b" font-size="8" text-anchor="middle">${ballsLabel}</text>
+    ${backBalls.map(({ ball, index }) => renderDragonBall(ball, index)).join("")}
+    ${characterSvg}
+    ${frontBalls.map(({ ball, index }) => renderDragonBall(ball, index)).join("")}
   </g>
+  <rect x="1" y="1" width="${CARD_WIDTH - 2}" height="${CARD_HEIGHT - 2}" rx="14" fill="none" stroke="#312e81" stroke-width="1.5" />
 
-  <circle cx="250" cy="125" r="78" fill="url(#ki-flare)" class="aura-glow" />
+  <polygon points="14,14 214,14 204,38 14,38" fill="#0f0a24" stroke="${primaryAura}" stroke-width="1.5" />
+  <text x="24" y="31" fill="#ffffff" font-size="13" font-weight="900" font-style="italic" letter-spacing="1">${escapeXml(currentForm.name)}</text>
+  <polygon points="14,44 ${14 + hpWidth},44 ${6 + hpWidth},56 14,56" fill="#1f1640" stroke="#000000" stroke-width="1" />
+  ${hpFill > 0 ? `<polygon points="14,44 ${14 + hpFill},44 ${Math.max(14, 6 + hpFill)},56 14,56" fill="url(#hp)" />` : ""}
+  ${hpNotches}
+  <text x="14" y="70" fill="#c4b5fd" font-size="8" font-weight="700">${escapeXml(nextLine)}</text>
+  <text x="14" y="82" fill="#7c6fb0" font-size="8">@${username}${joined} \xB7 ${escapeXml(currentForm.saga)}</text>
 
-  ${particlesSvg}
+  <rect x="224" y="8" width="52" height="52" rx="7" fill="#0f0a24" stroke="#fde047" stroke-width="1.5" />
+  <text x="250" y="36" fill="#fde047" font-size="24" font-weight="900" text-anchor="middle">${streak.current}</text>
+  <text x="250" y="46" fill="#fde047" font-size="6" font-weight="800" text-anchor="middle" letter-spacing="0.5">${streak.noun.toUpperCase()} STREAK</text>
+  <text x="250" y="55" fill="#a78bfa" font-size="6" text-anchor="middle">BEST ${streak.best}${streak.unit}</text>
 
-  ${backBalls.map(({ ball, index }) => renderDragonBall(ball, index)).join("")}
+  <text x="486" y="24" fill="#c4b5fd" font-size="8" font-weight="800" text-anchor="end" letter-spacing="2">POWER LEVEL</text>
+  <text x="486" y="50" fill="#fde047" font-size="26" font-weight="900" font-style="italic" text-anchor="end" stroke="#3b0764" stroke-width="1" paint-order="stroke">${stats.powerLevel.toLocaleString("en-US")}</text>
+  <text x="486" y="66" fill="#c4b5fd" font-size="8" font-weight="700" text-anchor="end">DRAGON BALLS ${unlockedBalls}/7</text>
+  <text x="486" y="78" fill="#7c6fb0" font-size="7" text-anchor="end">${escapeXml(ballsLine)}</text>
 
-  <g class="goku-stance">
-    ${spriteToSvg(skinSprite, gokuX, gokuY, gokuScale)}
-  </g>
-
-  ${lightningSvg}
-
-  ${frontBalls.map(({ ball, index }) => renderDragonBall(ball, index)).join("")}
-
-  <g class="font-tech" text-anchor="middle">
-    <text x="250" y="202" fill="#ffffff" font-size="15" font-weight="900" letter-spacing="2" filter="url(#glow)">${escapeXml(currentForm.name)}</text>
-    <text x="250" y="217" fill="#94a3b8" font-size="9">${escapeXml(subtitle)}</text>
-  </g>
-
-  <g class="font-tech">
-    <rect x="24" y="235" width="150" height="24" rx="4" fill="#18181b" stroke="#27272a" stroke-width="1" />
-    <text x="32" y="251" fill="#f43f5e" font-size="9" font-weight="700">STREAK ${stats.currentStreak}D</text>
-    <text x="112" y="251" fill="#64748b" font-size="9">BEST ${bestStreak}D</text>
-
-    <g>
-      <text x="184" y="238" fill="#64748b" font-size="8" font-weight="600">${escapeXml(nextLabel)}</text>
-      <text x="304" y="238" fill="#64748b" font-size="8" text-anchor="end">${nextForm ? `+${contributionsToNext.toLocaleString("en-US")}` : "MAX"}</text>
-      <rect x="184" y="243" width="120" height="6" rx="3" fill="#27272a" />
-      <rect x="184" y="243" width="${progressWidth}" height="6" rx="3" fill="${primaryAura}" />
-    </g>
-
-    <g>
-      <text x="316" y="238" fill="#64748b" font-size="8" font-weight="600">KI 14D</text>
-      ${activityBlocks}
-    </g>
-  </g>
+  <text x="16" y="262" fill="#c4b5fd" font-size="8" font-weight="800" letter-spacing="1">KI \xB7 14 DAYS</text>
+  ${activityBlocks}
+  <text x="484" y="264" fill="#c4b5fd" font-size="8" font-weight="800" text-anchor="end" letter-spacing="1">STAGE ${stage + 1}/3</text>
+  ${stagePips}
 </svg>`;
 }
 
 // node_modules/gifenc/dist/gifenc.esm.js
 var X = { signature: "GIF", version: "89a", trailer: 59, extensionIntroducer: 33, applicationExtensionLabel: 255, graphicControlExtensionLabel: 249, imageSeparator: 44, signatureSize: 3, versionSize: 3, globalColorTableFlagMask: 128, colorResolutionMask: 112, sortFlagMask: 8, globalColorTableSizeMask: 7, applicationIdentifierSize: 8, applicationAuthCodeSize: 3, disposalMethodMask: 28, userInputFlagMask: 2, transparentColorFlagMask: 1, localColorTableFlagMask: 128, interlaceFlagMask: 64, idSortFlagMask: 32, localColorTableSizeMask: 7 };
 function F(t = 256) {
-  let e = 0, s = new Uint8Array(t);
+  let e = 0, s2 = new Uint8Array(t);
   return { get buffer() {
-    return s.buffer;
+    return s2.buffer;
   }, reset() {
     e = 0;
   }, bytesView() {
-    return s.subarray(0, e);
+    return s2.subarray(0, e);
   }, bytes() {
-    return s.slice(0, e);
+    return s2.slice(0, e);
   }, writeByte(r) {
-    n(e + 1), s[e] = r, e++;
+    n(e + 1), s2[e] = r, e++;
   }, writeBytes(r, o = 0, i = r.length) {
     n(e + i);
-    for (let c = 0; c < i; c++) s[e++] = r[c + o];
+    for (let c = 0; c < i; c++) s2[e++] = r[c + o];
   }, writeBytesView(r, o = 0, i = r.byteLength) {
-    n(e + i), s.set(r.subarray(o, o + i), e), e += i;
+    n(e + i), s2.set(r.subarray(o, o + i), e), e += i;
   } };
   function n(r) {
-    var o = s.length;
+    var o = s2.length;
     if (o >= r) return;
     var i = 1024 * 1024;
     r = Math.max(r, o * (o < i ? 2 : 1.125) >>> 0), o != 0 && (r = Math.max(r, 256));
-    let c = s;
-    s = new Uint8Array(r), e > 0 && s.set(c.subarray(0, e), 0);
+    let c = s2;
+    s2 = new Uint8Array(r), e > 0 && s2.set(c.subarray(0, e), 0);
   }
 }
 var O = 12;
 var J = 5003;
 var lt = [0, 1, 3, 7, 15, 31, 63, 127, 255, 511, 1023, 2047, 4095, 8191, 16383, 32767, 65535];
-function at(t, e, s, n, r = F(512), o = new Uint8Array(256), i = new Int32Array(J), c = new Int32Array(J)) {
+function at(t, e, s2, n, r = F(512), o = new Uint8Array(256), i = new Int32Array(J), c = new Int32Array(J)) {
   let x = i.length, a = Math.max(2, n);
   o.fill(0), c.fill(0), i.fill(-1);
-  let l = 0, f = 0, g = a + 1, h = g, b = false, w = h, _ = (1 << w) - 1, u = 1 << g - 1, k = u + 1, B = u + 2, p = 0, A = s[0], z = 0;
+  let l = 0, f = 0, g = a + 1, h = g, b = false, w = h, _ = (1 << w) - 1, u = 1 << g - 1, k = u + 1, B = u + 2, p = 0, A = s2[0], z = 0;
   for (let y = x; y < 65536; y *= 2) ++z;
   z = 8 - z, r.writeByte(a), I(u);
-  let d = s.length;
+  let d = s2.length;
   for (let y = 1; y < d; y++) {
     t: {
-      let m = s[y], v = (m << O) + A, M = m << z ^ A;
+      let m = s2[y], v = (m << O) + A, M = m << z ^ A;
       if (i[M] === v) {
         A = c[M];
         break t;
@@ -22155,29 +22641,29 @@ function at(t, e, s, n, r = F(512), o = new Uint8Array(256), i = new Int32Array(
   }
 }
 var $ = at;
-function D(t, e, s) {
-  return t << 8 & 63488 | e << 2 & 992 | s >> 3;
+function D(t, e, s2) {
+  return t << 8 & 63488 | e << 2 & 992 | s2 >> 3;
 }
-function G(t, e, s, n) {
-  return t >> 4 | e & 240 | (s & 240) << 4 | (n & 240) << 8;
+function G(t, e, s2, n) {
+  return t >> 4 | e & 240 | (s2 & 240) << 4 | (n & 240) << 8;
 }
-function j(t, e, s) {
-  return t >> 4 << 8 | e & 240 | s >> 4;
+function j(t, e, s2) {
+  return t >> 4 << 8 | e & 240 | s2 >> 4;
 }
-function R(t, e, s) {
-  return t < e ? e : t > s ? s : t;
+function R(t, e, s2) {
+  return t < e ? e : t > s2 ? s2 : t;
 }
 function T(t) {
   return t * t;
 }
-function tt(t, e, s) {
+function tt(t, e, s2) {
   var n = 0, r = 1e100;
   let o = t[e], i = o.cnt, c = o.ac, x = o.rc, a = o.gc, l = o.bc;
   for (var f = o.fw; f != 0; f = t[f].fw) {
     let h = t[f], b = h.cnt, w = i * b / (i + b);
     if (!(w >= r)) {
       var g = 0;
-      s && (g += w * T(h.ac - c), g >= r) || (g += w * T(h.rc - x), !(g >= r) && (g += w * T(h.gc - a), !(g >= r) && (g += w * T(h.bc - l), !(g >= r) && (r = g, n = f))));
+      s2 && (g += w * T(h.ac - c), g >= r) || (g += w * T(h.rc - x), !(g >= r) && (g += w * T(h.gc - a), !(g >= r) && (g += w * T(h.bc - l), !(g >= r) && (r = g, n = f))));
     }
   }
   o.err = r, o.nn = n;
@@ -22186,7 +22672,7 @@ function Q() {
   return { ac: 0, rc: 0, gc: 0, bc: 0, cnt: 0, nn: 0, fw: 0, bk: 0, tm: 0, mtm: 0, err: 0 };
 }
 function ut(t, e) {
-  let s = e === "rgb444" ? 4096 : 65536, n = new Array(s), r = t.length;
+  let s2 = e === "rgb444" ? 4096 : 65536, n = new Array(s2), r = t.length;
   if (e === "rgba4444") for (let o = 0; o < r; ++o) {
     let i = t[o], c = i >> 24 & 255, x = i >> 16 & 255, a = i >> 8 & 255, l = i & 255, f = G(l, a, x, c), g = f in n ? n[f] : n[f] = Q();
     g.rc += l, g.gc += a, g.bc += x, g.ac += c, g.cnt++;
@@ -22201,11 +22687,11 @@ function ut(t, e) {
   }
   return n;
 }
-function H(t, e, s = {}) {
-  let { format: n = "rgb565", clearAlpha: r = true, clearAlphaColor: o = 0, clearAlphaThreshold: i = 0, oneBitAlpha: c = false } = s;
+function H(t, e, s2 = {}) {
+  let { format: n = "rgb565", clearAlpha: r = true, clearAlphaColor: o = 0, clearAlphaThreshold: i = 0, oneBitAlpha: c = false } = s2;
   if (!t || !t.buffer) throw new Error("quantize() expected RGBA Uint8Array data");
   if (!(t instanceof Uint8Array) && !(t instanceof Uint8ClampedArray)) throw new Error("quantize() expected RGBA Uint8Array data");
-  let x = new Uint32Array(t.buffer), a = s.useSqrt !== false, l = n === "rgba4444", f = ut(x, n), g = f.length, h = g - 1, b = new Uint32Array(g + 1);
+  let x = new Uint32Array(t.buffer), a = s2.useSqrt !== false, l = n === "rgba4444", f = ut(x, n), g = f.length, h = g - 1, b = new Uint32Array(g + 1);
   for (var w = 0, u = 0; u < g; ++u) {
     let C = f[u];
     if (C != null) {
@@ -22239,37 +22725,37 @@ function H(t, e, s = {}) {
   let M = [];
   var V = 0;
   for (u = 0; ; ++V) {
-    let L = R(Math.round(f[u].rc), 0, 255), C = R(Math.round(f[u].gc), 0, 255), Y = R(Math.round(f[u].bc), 0, 255), E = 255;
+    let L = R(Math.round(f[u].rc), 0, 255), C = R(Math.round(f[u].gc), 0, 255), Y2 = R(Math.round(f[u].bc), 0, 255), E = 255;
     if (l) {
       if (E = R(Math.round(f[u].ac), 0, 255), c) {
         let st = typeof c == "number" ? c : 127;
         E = E <= st ? 0 : 255;
       }
-      r && E <= i && (L = C = Y = o, E = 0);
+      r && E <= i && (L = C = Y2 = o, E = 0);
     }
-    let K = l ? [L, C, Y, E] : [L, C, Y];
+    let K = l ? [L, C, Y2, E] : [L, C, Y2];
     if (xt(M, K) || M.push(K), (u = f[u].fw) == 0) break;
   }
   return M;
 }
 function xt(t, e) {
-  for (let s = 0; s < t.length; s++) {
-    let n = t[s], r = n[0] === e[0] && n[1] === e[1] && n[2] === e[2], o = n.length >= 4 && e.length >= 4 ? n[3] === e[3] : true;
+  for (let s2 = 0; s2 < t.length; s2++) {
+    let n = t[s2], r = n[0] === e[0] && n[1] === e[1] && n[2] === e[2], o = n.length >= 4 && e.length >= 4 ? n[3] === e[3] : true;
     if (r && o) return true;
   }
   return false;
 }
-function nt(t, e, s = "rgb565") {
+function nt(t, e, s2 = "rgb565") {
   if (!t || !t.buffer) throw new Error("quantize() expected RGBA Uint8Array data");
   if (!(t instanceof Uint8Array) && !(t instanceof Uint8ClampedArray)) throw new Error("quantize() expected RGBA Uint8Array data");
   if (e.length > 256) throw new Error("applyPalette() only works with 256 colors or less");
-  let n = new Uint32Array(t.buffer), r = n.length, o = s === "rgb444" ? 4096 : 65536, i = new Uint8Array(r), c = new Array(o), x = s === "rgba4444";
-  if (s === "rgba4444") for (let a = 0; a < r; a++) {
+  let n = new Uint32Array(t.buffer), r = n.length, o = s2 === "rgb444" ? 4096 : 65536, i = new Uint8Array(r), c = new Array(o), x = s2 === "rgba4444";
+  if (s2 === "rgba4444") for (let a = 0; a < r; a++) {
     let l = n[a], f = l >> 24 & 255, g = l >> 16 & 255, h = l >> 8 & 255, b = l & 255, w = G(b, h, g, f), _ = w in c ? c[w] : c[w] = gt(b, h, g, f, e);
     i[a] = _;
   }
   else {
-    let a = s === "rgb444" ? j : D;
+    let a = s2 === "rgb444" ? j : D;
     for (let l = 0; l < r; l++) {
       let f = n[l], g = f >> 16 & 255, h = f >> 8 & 255, b = f & 255, w = a(b, h, g), _ = w in c ? c[w] : c[w] = bt(b, h, g, e);
       i[l] = _;
@@ -22277,7 +22763,7 @@ function nt(t, e, s = "rgb565") {
   }
   return i;
 }
-function gt(t, e, s, n, r) {
+function gt(t, e, s2, n, r) {
   let o = 0, i = 1e100;
   for (let c = 0; c < r.length; c++) {
     let x = r[c], a = x[3], l = q(a - n);
@@ -22287,11 +22773,11 @@ function gt(t, e, s, n, r) {
     let g = x[1];
     if (l += q(g - e), l > i) continue;
     let h = x[2];
-    l += q(h - s), !(l > i) && (i = l, o = c);
+    l += q(h - s2), !(l > i) && (i = l, o = c);
   }
   return o;
 }
-function bt(t, e, s, n) {
+function bt(t, e, s2, n) {
   let r = 0, o = 1e100;
   for (let i = 0; i < n.length; i++) {
     let c = n[i], x = c[0], a = q(x - t);
@@ -22299,7 +22785,7 @@ function bt(t, e, s, n) {
     let l = c[1];
     if (a += q(l - e), a > o) continue;
     let f = c[2];
-    a += q(f - s), !(a > o) && (o = a, r = i);
+    a += q(f - s2), !(a > o) && (o = a, r = i);
   }
   return r;
 }
@@ -22307,7 +22793,7 @@ function q(t) {
   return t * t;
 }
 function ct(t = {}) {
-  let { initialCapacity: e = 4096, auto: s = true } = t, n = F(e), r = 5003, o = new Uint8Array(256), i = new Int32Array(r), c = new Int32Array(r), x = false;
+  let { initialCapacity: e = 4096, auto: s2 = true } = t, n = F(e), r = 5003, o = new Uint8Array(256), i = new Int32Array(r), c = new Int32Array(r), x = false;
   return { reset() {
     n.reset(), x = false;
   }, finish() {
@@ -22322,7 +22808,7 @@ function ct(t = {}) {
     return n;
   }, writeHeader: a, writeFrame(l, f, g, h = {}) {
     let { transparent: b = false, transparentIndex: w = 0, delay: _ = 0, palette: u = null, repeat: k = 0, colorDepth: B = 8, dispose: p = -1 } = h, A = false;
-    if (s ? x || (A = true, a(), x = true) : A = Boolean(h.first), f = Math.max(0, Math.floor(f)), g = Math.max(0, Math.floor(g)), A) {
+    if (s2 ? x || (A = true, a(), x = true) : A = Boolean(h.first), f = Math.max(0, Math.floor(f)), g = Math.max(0, Math.floor(g)), A) {
       if (!u) throw new Error("First frame must include a { palette } option");
       pt(n, f, g, u, B), it(n, u), k >= 0 && dt(n, k);
     }
@@ -22335,41 +22821,41 @@ function ct(t = {}) {
     ft(n, "GIF89a");
   }
 }
-function wt(t, e, s, n, r) {
+function wt(t, e, s2, n, r) {
   t.writeByte(33), t.writeByte(249), t.writeByte(4), r < 0 && (r = 0, n = false);
   var o, i;
   n ? (o = 1, i = 2) : (o = 0, i = 0), e >= 0 && (i = e & 7), i <<= 2;
   let c = 0;
-  t.writeByte(0 | i | c | o), S(t, s), t.writeByte(r || 0), t.writeByte(0);
+  t.writeByte(0 | i | c | o), S(t, s2), t.writeByte(r || 0), t.writeByte(0);
 }
-function pt(t, e, s, n, r = 8) {
+function pt(t, e, s2, n, r = 8) {
   let o = 1, i = 0, c = Z(n.length) - 1, x = o << 7 | r - 1 << 4 | i << 3 | c, a = 0, l = 0;
-  S(t, e), S(t, s), t.writeBytes([x, a, l]);
+  S(t, e), S(t, s2), t.writeBytes([x, a, l]);
 }
 function dt(t, e) {
   t.writeByte(33), t.writeByte(255), t.writeByte(11), ft(t, "NETSCAPE2.0"), t.writeByte(3), t.writeByte(1), S(t, e), t.writeByte(0);
 }
 function it(t, e) {
-  let s = 1 << Z(e.length);
-  for (let n = 0; n < s; n++) {
+  let s2 = 1 << Z(e.length);
+  for (let n = 0; n < s2; n++) {
     let r = [0, 0, 0];
     n < e.length && (r = e[n]), t.writeByte(r[0]), t.writeByte(r[1]), t.writeByte(r[2]);
   }
 }
-function ht(t, e, s, n) {
-  if (t.writeByte(44), S(t, 0), S(t, 0), S(t, e), S(t, s), n) {
+function ht(t, e, s2, n) {
+  if (t.writeByte(44), S(t, 0), S(t, 0), S(t, e), S(t, s2), n) {
     let r = 0, o = 0, i = Z(n.length) - 1;
     t.writeByte(128 | r | o | 0 | i);
   } else t.writeByte(0);
 }
-function yt(t, e, s, n, r = 8, o, i, c) {
-  $(s, n, e, r, t, o, i, c);
+function yt(t, e, s2, n, r = 8, o, i, c) {
+  $(s2, n, e, r, t, o, i, c);
 }
 function S(t, e) {
   t.writeByte(e & 255), t.writeByte(e >> 8 & 255);
 }
 function ft(t, e) {
-  for (var s = 0; s < e.length; s++) t.writeByte(e.charCodeAt(s));
+  for (var s2 = 0; s2 < e.length; s2++) t.writeByte(e.charCodeAt(s2));
 }
 function Z(t) {
   return Math.max(Math.ceil(Math.log2(t)), 1);
@@ -22390,7 +22876,7 @@ var GLYPHS = {
   K: ["101", "101", "110", "101", "101"],
   L: ["100", "100", "100", "100", "111"],
   M: ["101", "111", "111", "101", "101"],
-  N: ["101", "111", "111", "111", "101"],
+  N: ["110", "101", "101", "101", "101"],
   O: ["010", "101", "101", "101", "010"],
   P: ["110", "101", "110", "100", "100"],
   Q: ["010", "101", "101", "111", "011"],
@@ -22399,7 +22885,7 @@ var GLYPHS = {
   T: ["111", "010", "010", "010", "010"],
   U: ["101", "101", "101", "101", "111"],
   V: ["101", "101", "101", "101", "010"],
-  W: ["101", "101", "111", "111", "101"],
+  W: ["101", "101", "101", "111", "101"],
   X: ["101", "101", "010", "101", "101"],
   Y: ["101", "101", "010", "010", "010"],
   Z: ["111", "001", "010", "100", "111"],
@@ -22420,6 +22906,7 @@ var GLYPHS = {
   "/": ["001", "001", "010", "100", "100"],
   "%": ["101", "001", "010", "100", "101"],
   "+": ["000", "010", "111", "010", "000"],
+  "~": ["000", "011", "110", "000", "000"],
   ",": ["000", "000", "000", "010", "100"],
   "!": ["010", "010", "010", "000", "010"],
   "?": ["110", "001", "010", "000", "010"],
@@ -22467,8 +22954,10 @@ function textToRects(text, x, y, scale, color) {
 
 // src/renderer/gif.ts
 var WIDTH = 500;
-var HEIGHT = 280;
-var ORBIT2 = { centerX: 250, centerY: 132, radiusX: 188, radiusY: 52 };
+var HEIGHT = 300;
+var ORBIT2 = { centerX: 250, centerY: 172, radiusX: 168, radiusY: 42 };
+var GROUND_Y2 = 266;
+var HORIZON_Y2 = 236;
 function hexToRgba(hex, alpha = 255) {
   if (hex === "transparent" || !hex) return [0, 0, 0, 0];
   let cleanHex = hex.replace("#", "");
@@ -22486,19 +22975,14 @@ function formatCompact2(value) {
   return String(value);
 }
 function renderGif(stats) {
-  const totalFrames = 8;
-  const delayMs = 110;
-  const skin = getSkin(stats.skinId || "goku");
-  const effectiveContributions = stats.peakContributions ?? stats.totalContributions;
-  const { currentForm, nextForm, progressPercent, contributionsToNext } = calculateFormProgression(effectiveContributions, skin.id);
-  const aura = calculateAuraFromStreak(stats.currentStreak, currentForm.hasSparks);
-  const unlockedBalls = stats.unlockedBalls ?? calculateUnlockedBalls(effectiveContributions);
-  const bestStreak = stats.bestStreak ?? stats.longestStreak;
-  const nextBall = nextDragonBallMilestone(effectiveContributions);
-  const skinSprite = getSkinSprite(skin.id, currentForm);
+  const totalFrames = FRAME_COUNT;
+  const delayMs = FRAME_DELAY_MS;
+  const card = buildCardModel(stats);
+  const { currentForm, nextForm, progressPercent, contributionsToNext, aura, unlockedBalls, nextBall, stage, eta, streak } = card;
+  const characterFrames = renderCharacterFrames(currentForm, aura, stage);
   const baseBall = getDragonBallBaseSprite();
-  const gokuScale = 4;
   const frames = [];
+  let background = null;
   for (let frameIndex = 0; frameIndex < totalFrames; frameIndex++) {
     const timeProgress = frameIndex / totalFrames;
     const rgba = new Uint8ClampedArray(WIDTH * HEIGHT * 4);
@@ -22524,13 +23008,13 @@ function renderGif(stats) {
         }
       }
     };
-    const drawSprite = (sprite, spriteFrame, startX, startY, scale, opacity = 1) => {
-      const frame = sprite.frames[spriteFrame % sprite.frames.length];
+    const drawSprite = (sprite2, spriteFrame, startX, startY, scale, opacity = 1) => {
+      const frame = sprite2.frames[spriteFrame % sprite2.frames.length];
       const pixel = Math.max(1, Math.round(scale));
       for (let row = 0; row < frame.length; row++) {
         const line = frame[row];
         for (let col = 0; col < line.length; col++) {
-          const hex = sprite.palette[line[col]];
+          const hex = sprite2.palette[line[col]];
           if (!hex || hex === "transparent") continue;
           const [r, g, b] = hexToRgba(hex);
           fillRect(
@@ -22589,110 +23073,122 @@ function renderGif(stats) {
         );
       }
     };
-    for (let y = 0; y < HEIGHT; y++) {
-      const t = y / HEIGHT;
-      fillRect(
-        0,
-        y,
-        WIDTH,
-        1,
-        Math.round(9 + (5 - 9) * t),
-        Math.round(13 + (8 - 13) * t),
-        Math.round(22 + (17 - 22) * t),
-        255
-      );
-    }
-    fillRect(2, 2, WIDTH - 4, 1, 30, 41, 59, 255);
-    fillRect(2, HEIGHT - 3, WIDTH - 4, 1, 30, 41, 59, 255);
-    fillRect(2, 2, 1, HEIGHT - 4, 30, 41, 59, 255);
-    fillRect(WIDTH - 3, 2, 1, HEIGHT - 4, 30, 41, 59, 255);
-    drawText("GIT-SAIYAN", 24, 18, 2, "#f59e0b");
-    fillRect(365, 16, 112, 22, 30, 27, 75, 255);
-    drawText(`PL ${formatCompact2(stats.powerLevel)}`, 373, 22, 2, "#a5b4fc");
-    drawText(`${skin.relic.short} ${unlockedBalls}/7`, 373, 42, 1, "#64748b");
-    drawText(`@${stats.username}`, 24, 44, 1, "#64748b");
     const [auraR, auraG, auraB] = hexToRgba(currentForm.auraColors.primary);
-    const auraPulse = Math.sin(timeProgress * Math.PI * 2) * 6;
-    drawCircle(250, 125, 58 + auraPulse, auraR, auraG, auraB, 45);
-    drawCircle(250, 125, 38 + auraPulse, auraR, auraG, auraB, 75);
-    const dragonBalls = calculateDragonBalls(unlockedBalls, timeProgress, ORBIT2);
-    for (const ball of dragonBalls.filter((item) => item.z < 0)) {
-      drawDragonBall(ball);
-    }
-    for (const particle of generateKiAuraParticles(
-      timeProgress,
-      250,
-      132,
-      aura.particleCount,
-      currentForm.auraColors.primary,
-      currentForm.auraColors.core
-    )) {
-      const [r, g, b] = hexToRgba(particle.color);
-      drawCircle(particle.x, particle.y, particle.radius, r, g, b, Math.round(particle.opacity * 255));
-    }
-    const sway = Math.round(Math.sin(timeProgress * Math.PI * 2) * 2);
-    drawSprite(
-      skinSprite,
-      frameIndex % 2,
-      250 - skinSprite.width * gokuScale / 2,
-      116 - skinSprite.height * gokuScale / 2 + sway,
-      gokuScale,
-      1
-    );
-    for (const arc of generateLightningArcs(
-      timeProgress,
-      250,
-      120,
-      aura.sparkCount,
-      currentForm.sparkColor || "#38bdf8"
-    )) {
-      const [r, g, b] = hexToRgba(arc.color);
-      for (let point = 0; point < arc.points.length - 1; point++) {
-        const [x1, y1] = arc.points[point];
-        const [x2, y2] = arc.points[point + 1];
-        const distance = Math.hypot(x2 - x1, y2 - y1);
-        for (let step = 0; step <= distance; step++) {
-          const t = step / (distance || 1);
-          setPixel(
-            Math.round(x1 + (x2 - x1) * t),
-            Math.round(y1 + (y2 - y1) * t),
-            r,
-            g,
-            b,
-            240
-          );
+    const fillPolygon = (points, shade, a = 255) => {
+      const xs = points.map((p) => p[0]);
+      const ys = points.map((p) => p[1]);
+      for (let y = Math.floor(Math.min(...ys)); y <= Math.ceil(Math.max(...ys)); y++) {
+        for (let x = Math.floor(Math.min(...xs)); x <= Math.ceil(Math.max(...xs)); x++) {
+          let inside = false;
+          for (let i = 0, j2 = points.length - 1; i < points.length; j2 = i++) {
+            const [xi, yi] = points[i];
+            const [xj, yj] = points[j2];
+            if (yi > y + 0.5 !== yj > y + 0.5 && x + 0.5 < (xj - xi) * (y + 0.5 - yi) / (yj - yi) + xi) inside = !inside;
+          }
+          if (inside) {
+            const [r, g, b] = shade(x);
+            setPixel(x, y, r, g, b, a);
+          }
         }
       }
+    };
+    const drawLine = (x1, y1, x2, y2, r, g, b, a) => {
+      const steps = Math.max(Math.abs(x2 - x1), Math.abs(y2 - y1));
+      for (let step = 0; step <= steps; step++) {
+        const t = steps === 0 ? 0 : step / steps;
+        setPixel(Math.round(x1 + (x2 - x1) * t), Math.round(y1 + (y2 - y1) * t), r, g, b, a);
+      }
+    };
+    const outline = (points, r, g, b) => {
+      points.forEach(([x, y], i) => {
+        const [nx, ny] = points[(i + 1) % points.length];
+        drawLine(x, y, nx, ny, r, g, b, 255);
+      });
+    };
+    const rightText = (value, right, y, scale, color) => drawText(value, Math.round(right - textWidth(value, scale)), y, scale, color);
+    const centerText = (value, center, y, scale, color) => drawText(value, Math.round(center - textWidth(value, scale) / 2), y, scale, color);
+    if (background) {
+      rgba.set(background);
+    } else {
+      for (let y = 0; y < HEIGHT; y++) {
+        const t = y / HEIGHT;
+        const mixTo = t < 0.75 ? t / 0.75 : 1 - (t - 0.75) / 0.25;
+        fillRect(0, y, WIDTH, 1, Math.round(11 + 15 * mixTo), Math.round(8 + 8 * mixTo), Math.round(32 + 21 * mixTo), 255);
+      }
+      for (let y = 130; y < HEIGHT; y++) {
+        for (let x = 0; x < WIDTH; x++) {
+          const d = Math.hypot((x - 250) / 260, (y - 250) / 120);
+          if (d < 1) setPixel(x, y, auraR, auraG, auraB, Math.round(90 * (1 - d)));
+        }
+      }
+      fillRect(0, HORIZON_Y2, WIDTH, HEIGHT - HORIZON_Y2, 18, 12, 38, 255);
+      for (let i = 0; i < 9; i++) drawLine(250, HORIZON_Y2, -200 + i * 112, HEIGHT, auraR, auraG, auraB, 46);
+      drawLine(0, HORIZON_Y2, WIDTH - 1, HORIZON_Y2, auraR, auraG, auraB, 115);
+      for (let y = GROUND_Y2 - 10; y <= GROUND_Y2 + 6; y++) {
+        for (let x = 188; x <= 312; x++) {
+          if (((x - 250) / 62) ** 2 + ((y - (GROUND_Y2 - 2)) / 8) ** 2 <= 1) setPixel(x, y, 0, 0, 0, 115);
+        }
+      }
+      background = rgba.slice();
     }
-    for (const ball of dragonBalls.filter((item) => item.z >= 0)) {
-      drawDragonBall(ball);
+    const dragonBalls = calculateDragonBalls(unlockedBalls, timeProgress, ORBIT2);
+    for (const ball of dragonBalls.filter((item) => item.z < 0)) drawDragonBall(ball);
+    const sprite = characterFrames[frameIndex % characterFrames.length];
+    const originX = 250 - CANVAS_WIDTH * DISPLAY_SCALE / 2;
+    const originY = GROUND_Y2 - FEET_Y * DISPLAY_SCALE;
+    for (let y = 0; y < sprite.height; y++) {
+      for (let x = 0; x < sprite.width; x++) {
+        const index = (y * sprite.width + x) * 4;
+        const alpha = sprite.data[index + 3];
+        if (alpha === 0) continue;
+        fillRect(originX + x * DISPLAY_SCALE, originY + y * DISPLAY_SCALE, DISPLAY_SCALE, DISPLAY_SCALE, sprite.data[index], sprite.data[index + 1], sprite.data[index + 2], alpha);
+      }
     }
-    const titleWidth = textWidth(currentForm.name, 2);
-    drawText(currentForm.name, Math.round(250 - titleWidth / 2), 194, 2, "#ffffff");
-    const relicWord = skin.relic.short.replace(/S$/, "");
-    const subtitle = `${currentForm.title}${nextBall ? ` - NEXT ${relicWord} ${nextBall.star} AT ${formatCompact2(nextBall.at)}` : ""}`;
-    const subtitleWidth = textWidth(subtitle, 1);
-    drawText(subtitle, Math.round(250 - subtitleWidth / 2), 210, 1, "#94a3b8");
-    fillRect(24, 235, 150, 24, 24, 24, 27, 255);
-    drawText(`STREAK ${stats.currentStreak}D`, 30, 242, 2, "#f43f5e");
-    drawText(`BEST ${bestStreak}D`, 120, 242, 1, "#64748b");
-    const nextLabel = nextForm ? `NEXT ${nextForm.name}` : "MAX FORM";
-    drawText(nextLabel, 184, 236, 1, "#64748b");
-    if (nextForm) {
-      const toGo = `+${formatCompact2(contributionsToNext)}`;
-      drawText(toGo, Math.round(304 - textWidth(toGo, 1)), 236, 1, "#64748b");
+    for (const ball of dragonBalls.filter((item) => item.z >= 0)) drawDragonBall(ball);
+    fillRect(1, 1, WIDTH - 2, 1, 49, 46, 129, 255);
+    fillRect(1, HEIGHT - 2, WIDTH - 2, 1, 49, 46, 129, 255);
+    fillRect(1, 1, 1, HEIGHT - 2, 49, 46, 129, 255);
+    fillRect(WIDTH - 2, 1, 1, HEIGHT - 2, 49, 46, 129, 255);
+    const plate = [[14, 14], [214, 14], [204, 38], [14, 38]];
+    fillPolygon(plate, () => [15, 10, 36]);
+    outline(plate, auraR, auraG, auraB);
+    drawText(currentForm.name, 24, 21, 2, "#ffffff");
+    const hpWidth = 190;
+    fillPolygon([[14, 44], [14 + hpWidth, 44], [6 + hpWidth, 56], [14, 56]], () => [31, 22, 64]);
+    const hpFill = Math.round(progressPercent / 100 * hpWidth);
+    if (hpFill > 0) {
+      fillPolygon([[14, 44], [14 + hpFill, 44], [Math.max(14, 6 + hpFill), 56], [14, 56]], (x) => {
+        const t = Math.min(1, Math.max(0, (x - 14) / hpWidth));
+        return [Math.round(253 + (auraR - 253) * t), Math.round(224 + (auraG - 224) * t), Math.round(71 + (auraB - 71) * t)];
+      });
     }
-    fillRect(184, 244, 120, 6, 39, 39, 42, 255);
-    fillRect(184, 244, Math.round(progressPercent / 100 * 120), 6, auraR, auraG, auraB, 255);
-    drawText("KI 14D", 316, 236, 1, "#64748b");
+    for (const fraction of [1 / 3, 2 / 3]) {
+      const x = 14 + Math.round(fraction * hpWidth);
+      drawLine(x, 44, x - 4, 56, 11, 8, 32, 255);
+    }
+    const nextLine = nextForm ? `NEXT ${nextForm.name} +${formatCompact2(contributionsToNext)} ${eta?.short ?? ""}` : "FINAL FORM REACHED";
+    drawText(nextLine, 14, 63, 1, "#c4b5fd");
+    drawText(`@${stats.username} - ${currentForm.saga}`, 14, 74, 1, "#7c6fb0");
+    fillRect(224, 8, 52, 52, 15, 10, 36, 255);
+    outline([[224, 8], [275, 8], [275, 59], [224, 59]], 253, 224, 71);
+    centerText(String(streak.current), 250, 15, 3, "#fde047");
+    centerText(`${streak.noun.toUpperCase()} STREAK`, 250, 38, 1, "#fde047");
+    centerText(`BEST ${streak.best}${streak.unit}`, 250, 48, 1, "#a78bfa");
+    rightText("POWER LEVEL", 486, 14, 1, "#c4b5fd");
+    rightText(stats.powerLevel.toLocaleString("en-US"), 486, 24, 3, "#fde047");
+    rightText(`DRAGON BALLS ${unlockedBalls}/7`, 486, 47, 1, "#c4b5fd");
+    rightText(nextBall ? `NEXT BALL ${nextBall.star} AT ${formatCompact2(nextBall.at)} THIS YEAR` : "SHENRON SUMMONED THIS YEAR", 486, 57, 1, "#7c6fb0");
+    drawText("KI - 14 DAYS", 16, 254, 1, "#c4b5fd");
     stats.recentDays.forEach((day, index) => {
-      const x = 316 + index * 11;
-      const intensity = Math.min(day.count, 6);
-      const height = 4 + intensity * 2;
-      const y = 256 - height;
-      const [r, g, b] = day.count > 0 ? day.count > 3 ? [34, 197, 94] : [21, 128, 61] : [51, 65, 85];
-      fillRect(x, y, 8, height, r, g, b, 255);
+      const height = 4 + Math.min(day.count, 6) * 2;
+      const [r, g, b] = day.count > 0 ? day.count > 3 ? [253, 224, 71] : [202, 138, 4] : [42, 32, 80];
+      fillRect(16 + index * 9, 286 - height, 8, height, r, g, b, 255);
     });
+    rightText(`STAGE ${stage + 1}/3`, 484, 257, 1, "#c4b5fd");
+    for (let pip = 0; pip < 3; pip++) {
+      const lit = pip <= stage;
+      fillRect(446 + pip * 13, 270, 10, 10, lit ? auraR : 42, lit ? auraG : 32, lit ? auraB : 80, 255);
+    }
     frames.push(rgba);
   }
   const combined = new Uint8ClampedArray(WIDTH * HEIGHT * 4 * frames.length);
@@ -22721,14 +23217,7 @@ function createState(stats, previous) {
     stats.totalContributions,
     stats.peakContributions ?? 0
   );
-  const unlockedBalls = Math.min(
-    7,
-    Math.max(
-      previous?.unlockedBalls ?? 0,
-      stats.unlockedBalls ?? 0,
-      calculateUnlockedBalls(peakContributions)
-    )
-  );
+  const unlockedBalls = Math.min(7, calculateUnlockedBalls(stats.rollingYearContributions ?? 0));
   const bestStreak = Math.max(
     previous?.bestStreak ?? 0,
     stats.bestStreak ?? 0,
@@ -22736,11 +23225,18 @@ function createState(stats, previous) {
     stats.currentStreak
   );
   const powerLevel = Math.max(previous?.powerLevel ?? 0, stats.powerLevel ?? 0);
+  const bestWeekStreak = Math.max(
+    previous?.bestWeekStreak ?? 0,
+    stats.bestWeekStreak ?? 0,
+    stats.longestWeekStreak ?? 0,
+    stats.currentWeekStreak ?? 0
+  );
   return {
     version: STATE_VERSION,
     peakContributions,
     unlockedBalls,
     bestStreak,
+    bestWeekStreak,
     powerLevel,
     updatedAt: (/* @__PURE__ */ new Date()).toISOString()
   };
@@ -22753,6 +23249,7 @@ function applyProgression(stats, previous) {
       peakContributions: state.peakContributions,
       unlockedBalls: state.unlockedBalls,
       bestStreak: state.bestStreak,
+      bestWeekStreak: state.bestWeekStreak,
       powerLevel: state.powerLevel
     },
     state
@@ -22761,7 +23258,9 @@ function applyProgression(stats, previous) {
 function loadState(filePath) {
   try {
     if (!import_node_fs.default.existsSync(filePath)) return null;
-    const raw = JSON.parse(import_node_fs.default.readFileSync(filePath, "utf-8"));
+    const text = import_node_fs.default.readFileSync(filePath, "utf-8");
+    if (text.trim() === "") return null;
+    const raw = JSON.parse(text);
     if (raw.version !== void 0 && raw.version !== STATE_VERSION) return null;
     if (!isCounter(raw.peakContributions)) return null;
     if (raw.unlockedBalls !== void 0 && (!isCounter(raw.unlockedBalls) || raw.unlockedBalls > 7)) {
@@ -22769,11 +23268,13 @@ function loadState(filePath) {
     }
     if (raw.bestStreak !== void 0 && !isCounter(raw.bestStreak)) return null;
     if (raw.powerLevel !== void 0 && !isCounter(raw.powerLevel)) return null;
+    if (raw.bestWeekStreak !== void 0 && !isCounter(raw.bestWeekStreak)) return null;
     return {
       version: STATE_VERSION,
       peakContributions: raw.peakContributions,
       unlockedBalls: raw.unlockedBalls ?? 0,
       bestStreak: raw.bestStreak ?? 0,
+      bestWeekStreak: raw.bestWeekStreak ?? 0,
       powerLevel: raw.powerLevel ?? 0,
       updatedAt: typeof raw.updatedAt === "string" ? raw.updatedAt : (/* @__PURE__ */ new Date(0)).toISOString()
     };
@@ -22786,7 +23287,7 @@ function saveState(filePath, state) {
   const directory = import_node_path.default.dirname(import_node_path.default.resolve(filePath));
   import_node_fs.default.mkdirSync(directory, { recursive: true });
   const existing = loadState(filePath);
-  const unchanged = existing !== null && existing.peakContributions === state.peakContributions && existing.unlockedBalls === state.unlockedBalls && existing.bestStreak === state.bestStreak && existing.powerLevel === state.powerLevel;
+  const unchanged = existing !== null && existing.peakContributions === state.peakContributions && existing.unlockedBalls === state.unlockedBalls && existing.bestStreak === state.bestStreak && (existing.bestWeekStreak ?? 0) === (state.bestWeekStreak ?? 0) && existing.powerLevel === state.powerLevel;
   const payload = {
     ...state,
     updatedAt: unchanged ? existing.updatedAt : state.updatedAt
@@ -22804,20 +23305,19 @@ async function runSaiyan(config) {
   if (!username) {
     throw new Error("A GitHub username is required.");
   }
-  const skin = getSkin(config.skin);
-  console.log(`[git-saiyan] Summoning the ${skin.name} skin for @${username}...`);
+  const streakMode = parseStreakMode(config.streakMode);
+  console.log(`[git-saiyan] Summoning Goku for @${username}...`);
   const stats = await fetchUserContributions(username, token, mock, {
     commits: config.commits,
     streak: config.streak,
-    form: config.form,
-    skin: skin.id
+    form: config.form
   });
   const previous = config.statePath ? loadState(config.statePath) : null;
   const { stats: baseStats, state } = applyProgression(stats, previous);
-  const progressed = { ...baseStats, skinId: skin.id };
+  const progressed = { ...baseStats, streakMode };
+  const card = buildCardModel(progressed);
   const { currentForm, nextForm, progressPercent } = calculateFormProgression(
-    progressed.peakContributions,
-    skin.id
+    progressed.peakContributions
   );
   console.log(`[git-saiyan] Current Form: ${currentForm.name} (${currentForm.title})`);
   console.log(
@@ -22825,10 +23325,12 @@ async function runSaiyan(config) {
   );
   console.log(`[git-saiyan] Power Level: ${progressed.powerLevel.toLocaleString("en-US")}`);
   console.log(
-    `[git-saiyan] Streak: ${progressed.currentStreak} days (best ${progressed.bestStreak}) \xB7 ${skin.relic.plural} ${progressed.unlockedBalls}/7`
+    `[git-saiyan] Streak (${card.streak.mode}): ${card.streak.current} ${card.streak.noun}s (best ${card.streak.best}) \xB7 Dragon Balls this year ${card.unlockedBalls}/7`
   );
   if (nextForm) {
-    console.log(`[git-saiyan] Next Form: ${nextForm.name} (${progressPercent}%)`);
+    console.log(
+      `[git-saiyan] Next Form: ${nextForm.name} (${progressPercent}%, power-up stage ${card.stage + 1}/3, ${card.eta?.long ?? ""})`
+    );
   }
   if (progressed.isMock) {
     console.log("[git-saiyan] Demo data in use. Pass a token (or unset --mock/--form) for live stats.");
@@ -22879,14 +23381,15 @@ async function runAction() {
     const outputsInput = getInput("outputs") || DEFAULT_OUTPUTS.join("\n");
     const outputs = outputsInput.split(/[\n,]/).map((value) => value.trim()).filter(Boolean);
     const statePath = getInput("state_file") || ".saiyan-state.json";
-    const skin = getInput("skin") || "goku";
-    await runSaiyan({ username, token, outputs, statePath, skin });
+    const streakMode = getInput("streak_mode") || "daily";
+    await runSaiyan({ username, token, outputs, statePath, streakMode });
   } catch (error2) {
     setFailed(`[git-saiyan] Action failed: ${error2.message}`);
   }
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
+  parseStreakMode,
   runAction,
   runSaiyan
 });

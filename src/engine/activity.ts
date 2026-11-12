@@ -111,3 +111,41 @@ export interface PowerLevelInput {
 export function computePowerLevel({ commits, prs, reviews, bestStreak }: PowerLevelInput): number {
   return Math.max(0, Math.round(commits * 10 + prs * 30 + reviews * 20 + bestStreak * 50));
 }
+
+/** Monday (UTC) of the week containing `dateKey`, as a date key. */
+export function weekStart(dateKey: string): string {
+  const day = new Date(`${dateKey}T00:00:00Z`).getUTCDay(); // 0 = Sunday
+  return dateKeyOffset(dateKey, -((day + 6) % 7));
+}
+
+/**
+ * Weekly streaks: runs of consecutive Monday-Sunday weeks with at least one
+ * active day. The current week is still in progress, so an empty current week
+ * does not break the streak; it counts from last week instead.
+ */
+export function computeWeeklyStreaks(days: ContributionDay[], today: string): { current: number; longest: number } {
+  const observed = filterUpcoming(days, today);
+  if (observed.length === 0) return { current: 0, longest: 0 };
+  const activeWeeks = new Set(observed.filter((day) => day.count > 0).map((day) => weekStart(day.date)));
+  const thisWeek = weekStart(today);
+
+  let current = 0;
+  let cursor = activeWeeks.has(thisWeek) ? thisWeek : dateKeyOffset(thisWeek, -7);
+  while (activeWeeks.has(cursor)) {
+    current++;
+    cursor = dateKeyOffset(cursor, -7);
+  }
+
+  const firstWeek = weekStart([...observed].sort((a, b) => a.date.localeCompare(b.date))[0].date);
+  let longest = 0;
+  let run = 0;
+  for (let week = firstWeek; week <= thisWeek; week = dateKeyOffset(week, 7)) {
+    if (activeWeeks.has(week)) {
+      run++;
+      longest = Math.max(longest, run);
+    } else if (week !== thisWeek) {
+      run = 0;
+    }
+  }
+  return { current, longest: Math.max(longest, current) };
+}

@@ -1,10 +1,11 @@
 import { graphql } from '@octokit/graphql';
 import type { ContributionDay, ContributionStats, SaiyanConfig } from './types.js';
-import { findForm } from '../engine/forms.js';
+import { GOKU_FORMS, findForm } from '../engine/forms.js';
 import {
   buildRecentDays,
   colorForCount,
   computeCurrentStreak,
+  computeWeeklyStreaks,
   computeLongestStreak,
   computePowerLevel,
   dateKeyOffset,
@@ -40,12 +41,36 @@ interface GraphQLResponse {
   } | null;
 }
 
-interface YearCollection {
+export interface YearCollection {
   totalCommitContributions: number;
   totalPullRequestContributions: number;
   totalPullRequestReviewContributions: number;
-  restrictedContributionsCount: number;
   contributionCalendar: { totalContributions: number };
+}
+
+/**
+ * Sum per-year collections into lifetime totals.
+ *
+ * `contributionCalendar.totalContributions` already includes private
+ * (restricted) contributions when the user shows them on their profile, so
+ * `restrictedContributionsCount` must NOT be added on top: doing so counts
+ * every private contribution twice.
+ */
+export function sumLifetimeYears(years: (YearCollection | null | undefined)[]): {
+  totalContributions: number;
+  totalCommits: number;
+  totalPRs: number;
+  totalReviews: number;
+} {
+  const totals = { totalContributions: 0, totalCommits: 0, totalPRs: 0, totalReviews: 0 };
+  for (const year of years) {
+    if (!year) continue;
+    totals.totalContributions += year.contributionCalendar?.totalContributions ?? 0;
+    totals.totalCommits += year.totalCommitContributions ?? 0;
+    totals.totalPRs += year.totalPullRequestContributions ?? 0;
+    totals.totalReviews += year.totalPullRequestReviewContributions ?? 0;
+  }
+  return totals;
 }
 
 interface LifetimeResponse {
@@ -78,11 +103,15 @@ const CONTRIBUTIONS_QUERY = `
   }
 `;
 
+function userNotFoundMessage(username: string): string {
+  return `GitHub user @${username} was not found. If this repository is owned by an organization, set github_user_name to a personal account.`;
+}
+
 export async function fetchUserContributions(
   username: string,
   token?: string,
   mock: boolean = false,
-  options?: Pick<SaiyanConfig, 'commits' | 'streak' | 'form' | 'skin'>
+  options?: Pick<SaiyanConfig, 'commits' | 'streak' | 'form'>
 ): Promise<ContributionStats> {
   if (
     mock ||
@@ -112,13 +141,17 @@ export async function fetchUserContributions(
       headers: { authorization: `bearer ${token}` },
     });
   } catch (error) {
-    throw new Error(`Failed to fetch contributions for @${username}: ${(error as Error).message}`);
+    const message = (error as Error).message;
+    // GitHub reports an unknown or organization login as a GraphQL error, not
+    // as `user: null`, so the friendly hint has to be attached here.
+    if (/Could not resolve to a User/i.test(message)) {
+      throw new Error(userNotFoundMessage(username));
+    }
+    throw new Error(`Failed to fetch contributions for @${username}: ${message}`);
   }
 
   if (!response.user) {
-    throw new Error(
-      `GitHub user @${username} was not found. If this repository is owned by an organization, set github_user_name to a personal account.`
-    );
+    throw new Error(userNotFoundMessage(username));
   }
 
   const collection = response.user.contributionsCollection;
@@ -138,6 +171,7 @@ export async function fetchUserContributions(
 
   const currentStreak = computeCurrentStreak(allDays, today);
   const longestStreak = computeLongestStreak(allDays);
+  const weekly = computeWeeklyStreaks(allDays, today);
   const recentDays = buildRecentDays(allDays, today, 14);
   const rollingYearContributions = calendar.totalContributions;
 
@@ -162,7 +196,6 @@ export async function fetchUserContributions(
             totalCommitContributions
             totalPullRequestContributions
             totalPullRequestReviewContributions
-            restrictedContributionsCount
             contributionCalendar { totalContributions }
           }`;
         })
@@ -182,20 +215,9 @@ export async function fetchUserContributions(
       });
 
       if (lifetime.user) {
-        totalContributions = 0;
-        totalCommits = 0;
-        totalPRs = 0;
-        totalReviews = 0;
-
-        for (const year of Object.values(lifetime.user)) {
-          if (!year) continue;
-          totalContributions +=
-            (year.contributionCalendar?.totalContributions ?? 0) +
-            (year.restrictedContributionsCount ?? 0);
-          totalCommits += year.totalCommitContributions ?? 0;
-          totalPRs += year.totalPullRequestContributions ?? 0;
-          totalReviews += year.totalPullRequestReviewContributions ?? 0;
-        }
+        ({ totalContributions, totalCommits, totalPRs, totalReviews } = sumLifetimeYears(
+          Object.values(lifetime.user)
+        ));
 
         if (totalContributions <= 0) {
           totalContributions = rollingYearContributions;
@@ -234,18 +256,24 @@ export async function fetchUserContributions(
     recentDays,
     joinedYear: new Date(response.user.createdAt).getUTCFullYear(),
     peakContributions: totalContributions,
-    unlockedBalls: calculateUnlockedBalls(totalContributions),
+    unlockedBalls: calculateUnlockedBalls(rollingYearContributions),
+    currentWeekStreak: weekly.current,
+    longestWeekStreak: weekly.longest,
     lifetimeEstimated,
     isMock: false,
-    skinId: 'goku',
   };
 }
 
 export function generateMockStats(
   username: string,
-  options?: Pick<SaiyanConfig, 'commits' | 'streak' | 'form' | 'skin'>
+  options?: Pick<SaiyanConfig, 'commits' | 'streak' | 'form'>
 ): ContributionStats {
-  const form = options?.form ? findForm(options.form, options.skin) : undefined;
+  const form = options?.form ? findForm(options.form) : undefined;
+  if (options?.form && !form) {
+    throw new Error(
+      `Unknown form "${options.form}". Available forms: ${GOKU_FORMS.map((item) => item.id).join(', ')}.`
+    );
+  }
   const targetLifetime = options?.commits ?? (form ? form.minContributions + 15 : 624);
   const targetStreak = options?.streak ?? 12;
   const rollingYearContributions = Math.max(1, Math.round(targetLifetime / 4));
@@ -266,6 +294,7 @@ export function generateMockStats(
 
   const currentStreak = computeCurrentStreak(days, today);
   const longestStreak = Math.max(computeLongestStreak(days), targetStreak, 28);
+  const weekly = computeWeeklyStreaks(days, today);
   const bestStreak = Math.max(longestStreak, currentStreak);
   const totalCommits = targetLifetime;
   const totalPRs = Math.round(targetLifetime / 20);
@@ -290,8 +319,9 @@ export function generateMockStats(
     recentDays: buildRecentDays(days, today, 14),
     joinedYear: 2019,
     peakContributions: targetLifetime,
-    unlockedBalls: calculateUnlockedBalls(targetLifetime),
+    unlockedBalls: calculateUnlockedBalls(rollingYearContributions),
+    currentWeekStreak: weekly.current,
+    longestWeekStreak: weekly.longest,
     isMock: true,
-    skinId: options?.skin ?? 'goku',
   };
 }

@@ -5,7 +5,10 @@ import { fetchUserContributions } from './api/github.js';
 import type { SaiyanConfig, ContributionStats } from './api/types.js';
 import { renderSvg } from './renderer/svg.js';
 import { renderGif } from './renderer/gif.js';
-import { calculateFormProgression, getSkin } from './engine/forms.js';
+import { calculateFormProgression } from './engine/forms.js';
+import { buildCardModel, parseStreakMode } from './engine/card.js';
+
+export { parseStreakMode } from './engine/card.js';
 import { applyProgression, loadState, saveState } from './state.js';
 
 const DEFAULT_OUTPUTS = ['dist/saiyan.svg', 'dist/saiyan.gif'];
@@ -16,22 +19,22 @@ export async function runSaiyan(config: SaiyanConfig): Promise<ContributionStats
   if (!username) {
     throw new Error('A GitHub username is required.');
   }
+  // Validate options before any network request.
+  const streakMode = parseStreakMode(config.streakMode);
 
-  const skin = getSkin(config.skin);
-  console.log(`[git-saiyan] Summoning the ${skin.name} skin for @${username}...`);
+  console.log(`[git-saiyan] Summoning Goku for @${username}...`);
   const stats = await fetchUserContributions(username, token, mock, {
     commits: config.commits,
     streak: config.streak,
     form: config.form,
-    skin: skin.id,
   });
 
   const previous = config.statePath ? loadState(config.statePath) : null;
   const { stats: baseStats, state } = applyProgression(stats, previous);
-  const progressed: ContributionStats = { ...baseStats, skinId: skin.id };
+  const progressed: ContributionStats = { ...baseStats, streakMode };
+  const card = buildCardModel(progressed);
   const { currentForm, nextForm, progressPercent } = calculateFormProgression(
-    progressed.peakContributions,
-    skin.id
+    progressed.peakContributions
   );
 
   console.log(`[git-saiyan] Current Form: ${currentForm.name} (${currentForm.title})`);
@@ -40,10 +43,12 @@ export async function runSaiyan(config: SaiyanConfig): Promise<ContributionStats
   );
   console.log(`[git-saiyan] Power Level: ${progressed.powerLevel.toLocaleString('en-US')}`);
   console.log(
-    `[git-saiyan] Streak: ${progressed.currentStreak} days (best ${progressed.bestStreak}) · ${skin.relic.plural} ${progressed.unlockedBalls}/7`
+    `[git-saiyan] Streak (${card.streak.mode}): ${card.streak.current} ${card.streak.noun}s (best ${card.streak.best}) · Dragon Balls this year ${card.unlockedBalls}/7`
   );
   if (nextForm) {
-    console.log(`[git-saiyan] Next Form: ${nextForm.name} (${progressPercent}%)`);
+    console.log(
+      `[git-saiyan] Next Form: ${nextForm.name} (${progressPercent}%, power-up stage ${card.stage + 1}/3, ${card.eta?.long ?? ''})`
+    );
   }
   if (progressed.isMock) {
     console.log('[git-saiyan] Demo data in use. Pass a token (or unset --mock/--form) for live stats.');
@@ -110,9 +115,9 @@ export async function runAction(): Promise<void> {
       .filter(Boolean);
 
     const statePath = core.getInput('state_file') || '.saiyan-state.json';
-    const skin = core.getInput('skin') || 'goku';
+    const streakMode = core.getInput('streak_mode') || 'daily';
 
-    await runSaiyan({ username, token, outputs, statePath, skin });
+    await runSaiyan({ username, token, outputs, statePath, streakMode });
   } catch (error) {
     core.setFailed(`[git-saiyan] Action failed: ${(error as Error).message}`);
   }
