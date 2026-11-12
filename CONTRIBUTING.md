@@ -9,18 +9,13 @@ npm ci
 npm run verify
 ```
 
-`npm run verify` runs the typecheck and the production build.
+`npm run verify` runs the typecheck, the test suite, and the production build.
 
 ## Tests
 
-The engine/renderer suite (`tests/run.ts`) is maintained locally and is not
-shipped in this repository. If you have a local checkout that includes it:
-
-```bash
-npm run verify:local   # typecheck + build + tests
-```
-
-Otherwise CI covers typecheck, build, and a stale-`dist` check.
+The engine/renderer suite lives in `tests/run.ts` and runs with `npm test`.
+CI runs it on every push and pull request, together with a stale-`dist` check.
+Add a test for every behavior change.
 
 ## Ground rules
 
@@ -35,8 +30,7 @@ Otherwise CI covers typecheck, build, and a stale-`dist` check.
 ## IP
 
 This is an unofficial fan project. Do not add assets that imply endorsement by
-Toei Animation, Shueisha, or Bird Studio. Original character skins are the
-preferred direction for anything that needs to be distributable or monetized.
+Toei Animation, Shueisha, or Bird Studio. Keep the project non-commercial.
 
 ## Pull request checklist
 

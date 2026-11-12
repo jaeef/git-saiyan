@@ -9,9 +9,14 @@ node_modules/
 coverage/
 *.tgz
 
-# Local-only: test suite, internal task board, pitch docs and demo media
-/tests/
+# Local-only: internal task board, pitch docs and demo media
 /WORKLOAD.md
-/CHANGELOG.md
 /docs/
 /assets/
+
+# Local preview pages (npm run gallery / scenarios / designs)
+/preview/
+
+# Demo cards written by `npm start` next to the committed Action build
+/dist/saiyan.svg
+/dist/saiyan.gif

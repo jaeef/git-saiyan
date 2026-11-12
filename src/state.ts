@@ -15,14 +15,9 @@ export function createState(stats: ContributionStats, previous?: SaiyanState | n
     stats.totalContributions,
     stats.peakContributions ?? 0
   );
-  const unlockedBalls = Math.min(
-    7,
-    Math.max(
-      previous?.unlockedBalls ?? 0,
-      stats.unlockedBalls ?? 0,
-      calculateUnlockedBalls(peakContributions)
-    )
-  );
+  // Dragon Balls are a yearly hunt: they follow the trailing 365 days and are
+  // not kept at their peak. Forms (peakContributions) still never go down.
+  const unlockedBalls = Math.min(7, calculateUnlockedBalls(stats.rollingYearContributions ?? 0));
   const bestStreak = Math.max(
     previous?.bestStreak ?? 0,
     stats.bestStreak ?? 0,
@@ -32,12 +27,19 @@ export function createState(stats: ContributionStats, previous?: SaiyanState | n
   // Power level is lifetime-derived, so persist its peak for the same reason as
   // XP: private-contribution visibility can change between runs.
   const powerLevel = Math.max(previous?.powerLevel ?? 0, stats.powerLevel ?? 0);
+  const bestWeekStreak = Math.max(
+    previous?.bestWeekStreak ?? 0,
+    stats.bestWeekStreak ?? 0,
+    stats.longestWeekStreak ?? 0,
+    stats.currentWeekStreak ?? 0
+  );
 
   return {
     version: STATE_VERSION,
     peakContributions,
     unlockedBalls,
     bestStreak,
+    bestWeekStreak,
     powerLevel,
     updatedAt: new Date().toISOString(),
   };
@@ -58,6 +60,7 @@ export function applyProgression(
       peakContributions: state.peakContributions,
       unlockedBalls: state.unlockedBalls,
       bestStreak: state.bestStreak,
+      bestWeekStreak: state.bestWeekStreak,
       powerLevel: state.powerLevel,
     },
     state,
@@ -67,7 +70,10 @@ export function applyProgression(
 export function loadState(filePath: string): SaiyanState | null {
   try {
     if (!fs.existsSync(filePath)) return null;
-    const raw = JSON.parse(fs.readFileSync(filePath, 'utf-8')) as Partial<SaiyanState>;
+    const text = fs.readFileSync(filePath, 'utf-8');
+    // The workflow's restore step leaves an empty file on the very first run.
+    if (text.trim() === '') return null;
+    const raw = JSON.parse(text) as Partial<SaiyanState>;
 
     // Reject the whole file if any persisted counter is not a sane integer.
     // A partially trusted file could otherwise inject NaN/Infinity into the SVG.
@@ -78,12 +84,14 @@ export function loadState(filePath: string): SaiyanState | null {
     }
     if (raw.bestStreak !== undefined && !isCounter(raw.bestStreak)) return null;
     if (raw.powerLevel !== undefined && !isCounter(raw.powerLevel)) return null;
+    if (raw.bestWeekStreak !== undefined && !isCounter(raw.bestWeekStreak)) return null;
 
     return {
       version: STATE_VERSION,
       peakContributions: raw.peakContributions,
       unlockedBalls: raw.unlockedBalls ?? 0,
       bestStreak: raw.bestStreak ?? 0,
+      bestWeekStreak: raw.bestWeekStreak ?? 0,
       powerLevel: raw.powerLevel ?? 0,
       updatedAt: typeof raw.updatedAt === 'string' ? raw.updatedAt : new Date(0).toISOString(),
     };
@@ -108,6 +116,7 @@ export function saveState(filePath: string, state: SaiyanState): void {
     existing.peakContributions === state.peakContributions &&
     existing.unlockedBalls === state.unlockedBalls &&
     existing.bestStreak === state.bestStreak &&
+    (existing.bestWeekStreak ?? 0) === (state.bestWeekStreak ?? 0) &&
     existing.powerLevel === state.powerLevel;
 
   const payload: SaiyanState = {

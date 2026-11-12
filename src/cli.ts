@@ -23,7 +23,7 @@ const program = new Command();
 program
   .name('git-saiyan')
   .description('A dynamic, contribution-driven Dragon Ball pixel-art companion for GitHub profiles')
-  .version('1.2.0');
+  .version('1.3.0');
 
 program
   .option('-u, --user <username>', 'GitHub username to query', process.env.GITHUB_ACTOR || 'octocat')
@@ -43,12 +43,8 @@ program
   )
   .option('-c, --commits <count>', 'Override lifetime contribution count', parseCount)
   .option('-s, --streak <days>', 'Override daily streak count', parseCount)
-  .option('--state <path>', 'Persist peak XP / unlocked balls in this JSON file')
-  .option(
-    '--skin <skinId>',
-    'Character skin to render (goku = fan skin, nova = original)',
-    'goku'
-  )
+  .option('--state <path>', 'Persist peak XP / best streaks in this JSON file')
+  .option('--streak-mode <mode>', 'Streak that drives the aura: daily or weekly', 'daily')
   .action(async (options) => {
     try {
       const preview =
@@ -66,11 +62,11 @@ program
         token: options.token,
         outputs: Array.isArray(options.output) ? options.output : [options.output],
         mock: preview,
-        skin: options.skin,
         form: options.form,
         commits: options.commits,
         streak: options.streak,
         statePath: options.state,
+        streakMode: options.streakMode,
       });
       console.log('\n✨ Saiyan powered up successfully!');
     } catch (err) {

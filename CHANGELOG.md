@@ -4,6 +4,67 @@ All notable changes to this project are documented here.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 versioning follows [SemVer](https://semver.org/).
 
+## [1.3.0] - 2026-11-12
+
+### Added
+
+- **New Goku art.** All 10 forms redrawn as shaded pixel art (128×120 canvas
+  shown at 2×): hand-picked 4-tone ramps, 1px outlines, a distinct hair
+  sculpt, palette and eyes per form (SSJ3 mane, SSJ4 red fur and tail, slimmer
+  God build, Kid Goku on the cloud with tail and power pole), angled brows,
+  two-tone eyes and clenched fists.
+- **Ki-charge animation.** 8 frames of hair flutter, sash sway and breathing
+  inside a pixel flame aura that grows with the streak, with rising ki
+  particles and lightning on spark forms.
+- **Tournament card layout.** Fighting-game HUD: form name plate with the
+  next-form progress as a health bar, the streak as the round timer, power
+  level as the score, an arena floor, 14-day ki bars and stage pips. The
+  Dragon Balls orbit Goku in 3D. SVG and GIF share the same layout.
+- **Power-up stages:** 3 stages inside each form (at one-third and two-thirds
+  of the way to the next). Each stage grows the aura and adds hair and body
+  glow.
+- **Next-form countdown** ("super saiyan 3 in ~5 months") from the
+  trailing-year pace.
+- **Weekly streak mode:** `streak_mode` Action input / `--streak-mode` CLI
+  flag. Counts Monday-Sunday weeks with at least one contribution; the best
+  weekly streak is kept in the state file.
+- Test suite (`tests/run.ts`, 38 tests) is part of the repository and runs in
+  CI and `npm run verify`.
+- Dev previews: `npm run gallery`, `npm run scenarios`, `npm run designs`,
+  `npm run preview:art`.
+
+### Changed
+
+- **Dragon Balls are a yearly hunt** over the trailing 365 days (10 / 25 /
+  50 / 100 / 200 / 350 / 500) instead of lifetime milestones; all 7 summon
+  Shenron. Balls can be lost after a quiet year; forms never go down. Chosen
+  after a study of 243 real widget users: the median user holds 5 balls and
+  about a third summon Shenron each year.
+- Card is 500×300 (was 500×280).
+- The SVG embeds the character frames as small PNGs (crisp
+  `image-rendering:pixelated`) and shows a still frame under
+  `prefers-reduced-motion`.
+- Base and Kid Goku auras are white with a blue edge.
+
+### Fixed
+
+- Lifetime totals no longer count private contributions twice (GitHub's
+  calendar total already includes `restrictedContributionsCount`).
+- `--form` with an unknown id fails with the list of valid forms instead of
+  rendering a default card.
+- Organization or unknown logins get the "set `github_user_name`" hint
+  (GitHub reports them as a GraphQL error, so the hint was unreachable).
+- The profile workflow compares the new card with the `output` branch, so it
+  really skips the push on unchanged days.
+- An empty state file (first workflow run) no longer logs a parse warning.
+- GIF bitmap font: `N` and `W` no longer look like `M`; added `~`.
+
+### Removed
+
+- The `nova` skin, the skin registry, and the `skin` input / `--skin` flag.
+  The project is Goku-only.
+- The old hand-typed Goku sprites and the vector particle/aura code.
+
 ## [1.2.0] - 2026-11-11
 
 ### Added

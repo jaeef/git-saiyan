@@ -25,14 +25,20 @@ export interface ContributionStats {
     joinedYear?: number;
     /** Highest lifetime contribution count ever recorded. */
     peakContributions: number;
-    /** Dragon Balls unlocked (0-7). */
+    /** Dragon Balls held this year (0-7), from the trailing 365 days. */
     unlockedBalls: number;
+    /** Consecutive Monday-Sunday weeks with activity (current week counts once active). */
+    currentWeekStreak?: number;
+    /** Longest weekly streak in the trailing year. */
+    longestWeekStreak?: number;
+    /** Best weekly streak ever recorded (state-aware). */
+    bestWeekStreak?: number;
+    /** Which streak drives the aura and HUD. Defaults to 'daily'. */
+    streakMode?: 'daily' | 'weekly';
     /** True when lifetime totals could not be fetched and the rolling year was used. */
     lifetimeEstimated?: boolean;
     /** True when the numbers are generated demo data. */
     isMock?: boolean;
-    /** Which skin rendered this card ('goku' | 'nova'). */
-    skinId: string;
 }
 export interface SaiyanConfig {
     username: string;
@@ -40,8 +46,8 @@ export interface SaiyanConfig {
     outputs?: string[];
     /** Path to the persisted progression state. Omit to disable persistence. */
     statePath?: string;
-    /** Character skin to render. Defaults to 'goku'. */
-    skin?: string;
+    /** 'daily' (default) or 'weekly' streaks for the aura and HUD. */
+    streakMode?: string;
     mock?: boolean;
     commits?: number;
     streak?: number;
@@ -52,6 +58,8 @@ export interface SaiyanState {
     peakContributions: number;
     unlockedBalls: number;
     bestStreak: number;
+    /** Best weekly streak ever recorded. */
+    bestWeekStreak?: number;
     /** Peak lifetime power level. */
     powerLevel: number;
     updatedAt: string;

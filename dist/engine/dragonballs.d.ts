@@ -14,9 +14,12 @@ export interface OrbitConfig {
     radiusX: number;
     radiusY: number;
 }
-/** Lifetime contribution milestones for the seven Dragon Balls. */
-export declare const DRAGON_BALL_MILESTONES: readonly [1, 100, 500, 1500, 3000, 5000, 7000];
-export declare function calculateUnlockedBalls(totalContributions: number): number;
+/**
+ * Yearly hunt: milestones over the trailing 365 days of contributions.
+ * Balls can be lost after a quiet year; forms never go down.
+ */
+export declare const DRAGON_BALL_MILESTONES: readonly [10, 25, 50, 100, 200, 350, 500];
+export declare function calculateUnlockedBalls(yearContributions: number): number;
 export declare function nextDragonBallMilestone(totalContributions: number): {
     star: number;
     at: number;

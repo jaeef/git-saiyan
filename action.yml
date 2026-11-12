@@ -24,10 +24,11 @@ inputs:
     description: 'JSON file used to keep progression monotonic across runs. Commit it with the generated card.'
     required: false
     default: '.saiyan-state.json'
-  skin:
-    description: 'Character skin to render: goku (fan skin) or nova (original, distribution-safe).'
+
+  streak_mode:
+    description: 'Streak that drives the aura: daily (days in a row) or weekly (weeks with at least one contribution).'
     required: false
-    default: 'goku'
+    default: 'daily'
 
 runs:
   using: 'node24'

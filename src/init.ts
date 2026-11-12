@@ -50,13 +50,16 @@ jobs:
             dist/saiyan.svg
             dist/saiyan.gif
           state_file: .saiyan-state.json
+          # streak_mode: weekly   # optional: count weeks instead of days
 
       - name: Publish generated card to the output branch
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -f dist/saiyan.svg dist/saiyan.gif .saiyan-state.json
-          if git diff --staged --quiet; then
+          # Compare with the published branch, not with main: the card files never
+          # exist on main, so a plain staged diff would report a change every day.
+          if git rev-parse --verify --quiet origin/output >/dev/null && git diff --staged --quiet origin/output -- dist/saiyan.svg dist/saiyan.gif .saiyan-state.json; then
             echo "No card changes today."
           else
             git commit -m "chore: power up Goku [skip ci]"
