@@ -1,23 +1,26 @@
 import { GIFEncoder, quantize, applyPalette } from 'gifenc';
 import type { ContributionStats } from '../api/types.js';
-import { calculateFormProgression, getSkin } from '../engine/forms.js';
-import {
-  calculateDragonBalls,
-  calculateUnlockedBalls,
-  nextDragonBallMilestone,
-} from '../engine/dragonballs.js';
-import { calculateAuraFromStreak } from '../engine/streak.js';
+import { calculateDragonBalls } from '../engine/dragonballs.js';
+import { buildCardModel } from '../engine/card.js';
 import {
   getDragonBallBaseSprite,
   getDragonBallStarLayout,
-  getSkinSprite,
 } from '../assets/sprites.js';
-import { generateKiAuraParticles, generateLightningArcs } from './particles.js';
+import {
+  CANVAS_WIDTH,
+  DISPLAY_SCALE,
+  FEET_Y,
+  FRAME_COUNT,
+  FRAME_DELAY_MS,
+  renderCharacterFrames,
+} from '../art/index.js';
 import { textToRects, textWidth } from './font.js';
 
 const WIDTH = 500;
-const HEIGHT = 280;
-const ORBIT = { centerX: 250, centerY: 132, radiusX: 188, radiusY: 52 };
+const HEIGHT = 300;
+const ORBIT = { centerX: 250, centerY: 172, radiusX: 168, radiusY: 42 };
+const GROUND_Y = 266;
+const HORIZON_Y = 236;
 
 function hexToRgba(hex: string, alpha: number = 255): [number, number, number, number] {
   if (hex === 'transparent' || !hex) return [0, 0, 0, 0];
@@ -41,21 +44,15 @@ function formatCompact(value: number): string {
 }
 
 export function renderGif(stats: ContributionStats): Uint8Array {
-  const totalFrames = 8;
-  const delayMs = 110;
+  const totalFrames = FRAME_COUNT;
+  const delayMs = FRAME_DELAY_MS;
 
-  const skin = getSkin(stats.skinId || 'goku');
-  const effectiveContributions = stats.peakContributions ?? stats.totalContributions;
-  const { currentForm, nextForm, progressPercent, contributionsToNext } =
-    calculateFormProgression(effectiveContributions, skin.id);
-  const aura = calculateAuraFromStreak(stats.currentStreak, currentForm.hasSparks);
-  const unlockedBalls = stats.unlockedBalls ?? calculateUnlockedBalls(effectiveContributions);
-  const bestStreak = stats.bestStreak ?? stats.longestStreak;
-  const nextBall = nextDragonBallMilestone(effectiveContributions);
-  const skinSprite = getSkinSprite(skin.id, currentForm);
+  const card = buildCardModel(stats);
+  const { currentForm, nextForm, progressPercent, contributionsToNext, aura, unlockedBalls, nextBall, stage, eta, streak } = card;
+  const characterFrames = renderCharacterFrames(currentForm, aura, stage);
   const baseBall = getDragonBallBaseSprite();
-  const gokuScale = 4;
   const frames: Uint8ClampedArray[] = [];
+  let background: Uint8ClampedArray | null = null;
 
   for (let frameIndex = 0; frameIndex < totalFrames; frameIndex++) {
     const timeProgress = frameIndex / totalFrames;
@@ -86,7 +83,7 @@ export function renderGif(stats: ContributionStats): Uint8Array {
     };
 
     const drawSprite = (
-      sprite: typeof skinSprite,
+      sprite: typeof baseBall,
       spriteFrame: number,
       startX: number,
       startY: number,
@@ -162,134 +159,149 @@ export function renderGif(stats: ContributionStats): Uint8Array {
       }
     };
 
-    // Background gradient
-    for (let y = 0; y < HEIGHT; y++) {
-      const t = y / HEIGHT;
-      fillRect(
-        0,
-        y,
-        WIDTH,
-        1,
-        Math.round(9 + (5 - 9) * t),
-        Math.round(13 + (8 - 13) * t),
-        Math.round(22 + (17 - 22) * t),
-        255
-      );
-    }
-
-    // Border
-    fillRect(2, 2, WIDTH - 4, 1, 30, 41, 59, 255);
-    fillRect(2, HEIGHT - 3, WIDTH - 4, 1, 30, 41, 59, 255);
-    fillRect(2, 2, 1, HEIGHT - 4, 30, 41, 59, 255);
-    fillRect(WIDTH - 3, 2, 1, HEIGHT - 4, 30, 41, 59, 255);
-
-    // Header
-    drawText('GIT-SAIYAN', 24, 18, 2, '#f59e0b');
-    fillRect(365, 16, 112, 22, 30, 27, 75, 255);
-    drawText(`PL ${formatCompact(stats.powerLevel)}`, 373, 22, 2, '#a5b4fc');
-    drawText(`${skin.relic.short} ${unlockedBalls}/7`, 373, 42, 1, '#64748b');
-    drawText(`@${stats.username}`, 24, 44, 1, '#64748b');
-
-    // Aura
     const [auraR, auraG, auraB] = hexToRgba(currentForm.auraColors.primary);
-    const auraPulse = Math.sin(timeProgress * Math.PI * 2) * 6;
-    drawCircle(250, 125, 58 + auraPulse, auraR, auraG, auraB, 45);
-    drawCircle(250, 125, 38 + auraPulse, auraR, auraG, auraB, 75);
 
-    // Dragon Balls behind
-    const dragonBalls = calculateDragonBalls(unlockedBalls, timeProgress, ORBIT);
-    for (const ball of dragonBalls.filter((item) => item.z < 0)) {
-      drawDragonBall(ball);
-    }
-
-    // Particles
-    for (const particle of generateKiAuraParticles(
-      timeProgress,
-      250,
-      132,
-      aura.particleCount,
-      currentForm.auraColors.primary,
-      currentForm.auraColors.core
-    )) {
-      const [r, g, b] = hexToRgba(particle.color);
-      drawCircle(particle.x, particle.y, particle.radius, r, g, b, Math.round(particle.opacity * 255));
-    }
-
-    // Goku
-    const sway = Math.round(Math.sin(timeProgress * Math.PI * 2) * 2);
-    drawSprite(
-      skinSprite,
-      frameIndex % 2,
-      250 - (skinSprite.width * gokuScale) / 2,
-      116 - (skinSprite.height * gokuScale) / 2 + sway,
-      gokuScale,
-      1
-    );
-
-    // Lightning
-    for (const arc of generateLightningArcs(
-      timeProgress,
-      250,
-      120,
-      aura.sparkCount,
-      currentForm.sparkColor || '#38bdf8'
-    )) {
-      const [r, g, b] = hexToRgba(arc.color);
-      for (let point = 0; point < arc.points.length - 1; point++) {
-        const [x1, y1] = arc.points[point];
-        const [x2, y2] = arc.points[point + 1];
-        const distance = Math.hypot(x2 - x1, y2 - y1);
-        for (let step = 0; step <= distance; step++) {
-          const t = step / (distance || 1);
-          setPixel(
-            Math.round(x1 + (x2 - x1) * t),
-            Math.round(y1 + (y2 - y1) * t),
-            r,
-            g,
-            b,
-            240
-          );
+    /** Fill a polygon; `shade` may vary the color per column (for gradients). */
+    const fillPolygon = (
+      points: [number, number][],
+      shade: (x: number) => [number, number, number],
+      a = 255
+    ) => {
+      const xs = points.map((p) => p[0]);
+      const ys = points.map((p) => p[1]);
+      for (let y = Math.floor(Math.min(...ys)); y <= Math.ceil(Math.max(...ys)); y++) {
+        for (let x = Math.floor(Math.min(...xs)); x <= Math.ceil(Math.max(...xs)); x++) {
+          let inside = false;
+          for (let i = 0, j = points.length - 1; i < points.length; j = i++) {
+            const [xi, yi] = points[i];
+            const [xj, yj] = points[j];
+            if (yi > y + 0.5 !== yj > y + 0.5 && x + 0.5 < ((xj - xi) * (y + 0.5 - yi)) / (yj - yi) + xi) inside = !inside;
+          }
+          if (inside) {
+            const [r, g, b] = shade(x);
+            setPixel(x, y, r, g, b, a);
+          }
         }
+      }
+    };
+    const drawLine = (x1: number, y1: number, x2: number, y2: number, r: number, g: number, b: number, a: number) => {
+      const steps = Math.max(Math.abs(x2 - x1), Math.abs(y2 - y1));
+      for (let step = 0; step <= steps; step++) {
+        const t = steps === 0 ? 0 : step / steps;
+        setPixel(Math.round(x1 + (x2 - x1) * t), Math.round(y1 + (y2 - y1) * t), r, g, b, a);
+      }
+    };
+    const outline = (points: [number, number][], r: number, g: number, b: number) => {
+      points.forEach(([x, y], i) => {
+        const [nx, ny] = points[(i + 1) % points.length];
+        drawLine(x, y, nx, ny, r, g, b, 255);
+      });
+    };
+    const rightText = (value: string, right: number, y: number, scale: number, color: string) =>
+      drawText(value, Math.round(right - textWidth(value, scale)), y, scale, color);
+    const centerText = (value: string, center: number, y: number, scale: number, color: string) =>
+      drawText(value, Math.round(center - textWidth(value, scale) / 2), y, scale, color);
+
+    // --- Arena: sky, spotlight, floor grid (identical every frame) -----------------
+    if (background) {
+      rgba.set(background);
+    } else {
+      for (let y = 0; y < HEIGHT; y++) {
+        const t = y / HEIGHT;
+        const mixTo = t < 0.75 ? t / 0.75 : 1 - (t - 0.75) / 0.25;
+        fillRect(0, y, WIDTH, 1, Math.round(11 + 15 * mixTo), Math.round(8 + 8 * mixTo), Math.round(32 + 21 * mixTo), 255);
+      }
+      for (let y = 130; y < HEIGHT; y++) {
+        for (let x = 0; x < WIDTH; x++) {
+          const d = Math.hypot((x - 250) / 260, (y - 250) / 120);
+          if (d < 1) setPixel(x, y, auraR, auraG, auraB, Math.round(90 * (1 - d)));
+        }
+      }
+      fillRect(0, HORIZON_Y, WIDTH, HEIGHT - HORIZON_Y, 18, 12, 38, 255);
+      for (let i = 0; i < 9; i++) drawLine(250, HORIZON_Y, -200 + i * 112, HEIGHT, auraR, auraG, auraB, 46);
+      drawLine(0, HORIZON_Y, WIDTH - 1, HORIZON_Y, auraR, auraG, auraB, 115);
+      for (let y = GROUND_Y - 10; y <= GROUND_Y + 6; y++) {
+        for (let x = 188; x <= 312; x++) {
+          if (((x - 250) / 62) ** 2 + ((y - (GROUND_Y - 2)) / 8) ** 2 <= 1) setPixel(x, y, 0, 0, 0, 115);
+        }
+      }
+      background = rgba.slice();
+    }
+
+    // --- Dragon Balls orbit Goku: back half, character, front half --------------------
+    const dragonBalls = calculateDragonBalls(unlockedBalls, timeProgress, ORBIT);
+    for (const ball of dragonBalls.filter((item) => item.z < 0)) drawDragonBall(ball);
+
+    const sprite = characterFrames[frameIndex % characterFrames.length];
+    const originX = 250 - (CANVAS_WIDTH * DISPLAY_SCALE) / 2;
+    const originY = GROUND_Y - FEET_Y * DISPLAY_SCALE;
+    for (let y = 0; y < sprite.height; y++) {
+      for (let x = 0; x < sprite.width; x++) {
+        const index = (y * sprite.width + x) * 4;
+        const alpha = sprite.data[index + 3];
+        if (alpha === 0) continue;
+        fillRect(originX + x * DISPLAY_SCALE, originY + y * DISPLAY_SCALE, DISPLAY_SCALE, DISPLAY_SCALE, sprite.data[index], sprite.data[index + 1], sprite.data[index + 2], alpha);
       }
     }
 
-    // Dragon Balls in front
-    for (const ball of dragonBalls.filter((item) => item.z >= 0)) {
-      drawDragonBall(ball);
+    for (const ball of dragonBalls.filter((item) => item.z >= 0)) drawDragonBall(ball);
+
+    // Card border.
+    fillRect(1, 1, WIDTH - 2, 1, 49, 46, 129, 255);
+    fillRect(1, HEIGHT - 2, WIDTH - 2, 1, 49, 46, 129, 255);
+    fillRect(1, 1, 1, HEIGHT - 2, 49, 46, 129, 255);
+    fillRect(WIDTH - 2, 1, 1, HEIGHT - 2, 49, 46, 129, 255);
+
+    // --- Name plate and health bar (progress to the next form) ------------------------
+    const plate: [number, number][] = [[14, 14], [214, 14], [204, 38], [14, 38]];
+    fillPolygon(plate, () => [15, 10, 36]);
+    outline(plate, auraR, auraG, auraB);
+    drawText(currentForm.name, 24, 21, 2, '#ffffff');
+
+    const hpWidth = 190;
+    fillPolygon([[14, 44], [14 + hpWidth, 44], [6 + hpWidth, 56], [14, 56]], () => [31, 22, 64]);
+    const hpFill = Math.round((progressPercent / 100) * hpWidth);
+    if (hpFill > 0) {
+      fillPolygon([[14, 44], [14 + hpFill, 44], [Math.max(14, 6 + hpFill), 56], [14, 56]], (x) => {
+        const t = Math.min(1, Math.max(0, (x - 14) / hpWidth));
+        return [Math.round(253 + (auraR - 253) * t), Math.round(224 + (auraG - 224) * t), Math.round(71 + (auraB - 71) * t)];
+      });
     }
-
-    // Form name
-    const titleWidth = textWidth(currentForm.name, 2);
-    drawText(currentForm.name, Math.round(250 - titleWidth / 2), 194, 2, '#ffffff');
-    const relicWord = skin.relic.short.replace(/S$/, '');
-    const subtitle = `${currentForm.title}${nextBall ? ` - NEXT ${relicWord} ${nextBall.star} AT ${formatCompact(nextBall.at)}` : ''}`;
-    const subtitleWidth = textWidth(subtitle, 1);
-    drawText(subtitle, Math.round(250 - subtitleWidth / 2), 210, 1, '#94a3b8');
-
-    // Bottom HUD
-    fillRect(24, 235, 150, 24, 24, 24, 27, 255);
-    drawText(`STREAK ${stats.currentStreak}D`, 30, 242, 2, '#f43f5e');
-    drawText(`BEST ${bestStreak}D`, 120, 242, 1, '#64748b');
-
-    const nextLabel = nextForm ? `NEXT ${nextForm.name}` : 'MAX FORM';
-    drawText(nextLabel, 184, 236, 1, '#64748b');
-    if (nextForm) {
-      const toGo = `+${formatCompact(contributionsToNext)}`;
-      drawText(toGo, Math.round(304 - textWidth(toGo, 1)), 236, 1, '#64748b');
+    for (const fraction of [1 / 3, 2 / 3]) {
+      const x = 14 + Math.round(fraction * hpWidth);
+      drawLine(x, 44, x - 4, 56, 11, 8, 32, 255);
     }
-    fillRect(184, 244, 120, 6, 39, 39, 42, 255);
-    fillRect(184, 244, Math.round((progressPercent / 100) * 120), 6, auraR, auraG, auraB, 255);
+    const nextLine = nextForm
+      ? `NEXT ${nextForm.name} +${formatCompact(contributionsToNext)} ${eta?.short ?? ''}`
+      : 'FINAL FORM REACHED';
+    drawText(nextLine, 14, 63, 1, '#c4b5fd');
+    drawText(`@${stats.username} - ${currentForm.saga}`, 14, 74, 1, '#7c6fb0');
 
-    drawText('KI 14D', 316, 236, 1, '#64748b');
+    // --- Round timer = current streak -------------------------------------------------
+    fillRect(224, 8, 52, 52, 15, 10, 36, 255);
+    outline([[224, 8], [275, 8], [275, 59], [224, 59]], 253, 224, 71);
+    centerText(String(streak.current), 250, 15, 3, '#fde047');
+    centerText(`${streak.noun.toUpperCase()} STREAK`, 250, 38, 1, '#fde047');
+    centerText(`BEST ${streak.best}${streak.unit}`, 250, 48, 1, '#a78bfa');
+
+    // --- Power level and Dragon Balls ---------------------------------------------------
+    rightText('POWER LEVEL', 486, 14, 1, '#c4b5fd');
+    rightText(stats.powerLevel.toLocaleString('en-US'), 486, 24, 3, '#fde047');
+    rightText(`DRAGON BALLS ${unlockedBalls}/7`, 486, 47, 1, '#c4b5fd');
+    rightText(nextBall ? `NEXT BALL ${nextBall.star} AT ${formatCompact(nextBall.at)} THIS YEAR` : 'SHENRON SUMMONED THIS YEAR', 486, 57, 1, '#7c6fb0');
+
+    // --- Bottom: 14-day ki bars and power-up stage ----------------------------------------
+    drawText('KI - 14 DAYS', 16, 254, 1, '#c4b5fd');
     stats.recentDays.forEach((day, index) => {
-      const x = 316 + index * 11;
-      const intensity = Math.min(day.count, 6);
-      const height = 4 + intensity * 2;
-      const y = 256 - height;
-      const [r, g, b] =
-        day.count > 0 ? (day.count > 3 ? [34, 197, 94] : [21, 128, 61]) : [51, 65, 85];
-      fillRect(x, y, 8, height, r, g, b, 255);
+      const height = 4 + Math.min(day.count, 6) * 2;
+      const [r, g, b] = day.count > 0 ? (day.count > 3 ? [253, 224, 71] : [202, 138, 4]) : [42, 32, 80];
+      fillRect(16 + index * 9, 286 - height, 8, height, r, g, b, 255);
     });
+    rightText(`STAGE ${stage + 1}/3`, 484, 257, 1, '#c4b5fd');
+    for (let pip = 0; pip < 3; pip++) {
+      const lit = pip <= stage;
+      fillRect(446 + pip * 13, 270, 10, 10, lit ? auraR : 42, lit ? auraG : 32, lit ? auraB : 80, 255);
+    }
 
     frames.push(rgba);
   }

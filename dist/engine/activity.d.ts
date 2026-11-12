@@ -31,3 +31,14 @@ export interface PowerLevelInput {
  * and reviews, so it must not be used here or those events count twice.
  */
 export declare function computePowerLevel({ commits, prs, reviews, bestStreak }: PowerLevelInput): number;
+/** Monday (UTC) of the week containing `dateKey`, as a date key. */
+export declare function weekStart(dateKey: string): string;
+/**
+ * Weekly streaks: runs of consecutive Monday-Sunday weeks with at least one
+ * active day. The current week is still in progress, so an empty current week
+ * does not break the streak; it counts from last week instead.
+ */
+export declare function computeWeeklyStreaks(days: ContributionDay[], today: string): {
+    current: number;
+    longest: number;
+};

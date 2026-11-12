@@ -1,7 +1,5 @@
 name: CI
 
-# The test suite is maintained locally (tests/ is not published), so CI runs
-# typecheck, build, and a stale-dist check.
 on:
   push:
     branches: [main]
@@ -33,6 +31,9 @@ jobs:
 
       - name: Typecheck
         run: npm run typecheck
+
+      - name: Test
+        run: npm test
 
       - name: Build
         run: npm run build
