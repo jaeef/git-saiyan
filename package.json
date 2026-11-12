@@ -23,6 +23,7 @@
     "gallery": "tsx scripts/gallery.ts",
     "scenarios": "tsx scripts/scenarios.ts",
     "designs": "tsx scripts/designs.ts",
+    "forms-sheet": "tsx scripts/forms-sheet.ts",
     "start": "node dist/cli.js",
     "test": "tsx tests/run.ts",
     "verify": "npm run typecheck && npm test && npm run build",

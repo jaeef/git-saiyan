@@ -14,44 +14,15 @@ drives the ki aura. Each year is a new hunt for the 7 Dragon Balls.
 
 Animated **SVG** (SMIL) + **GIF** · zero Docker · zero native modules
 
-<img src="./examples/demo-goku.svg" width="500" alt="Demo card: Super Saiyan 3 with a full ki aura" />
+<img src="./examples/demo-goku.svg" width="500" alt="Demo card: Ultra Instinct with a full ki aura and all 7 Dragon Balls" />
 
 </div>
 
-## The card
-
-```
-┌──────────────────────────────────────────────────────────────┐
-│ ╱ SUPER SAIYAN 3 ╱        ┌────┐             POWER LEVEL      │
-│ ▰▰▰▰▱▱▱▱▱▱ (health bar)   │ 21 │                  13,580      │
-│ NEXT ▸ SSJ4 · +735 · ~3y  │DAY │        DRAGON BALLS 5/7      │
-│ @you · Majin Buu Saga     └────┘  NEXT BALL 6★ AT 350 THIS YEAR │
-│        ●                  (Goku)                  ●           │
-│               ●      ki-charge aura      ●                    │
-│ ───────────────────── arena floor ─────────────────────────── │
-│ KI · 14 DAYS ▂▅▃▇▆▂▅                              STAGE 1/3 ■□□ │
-└──────────────────────────────────────────────────────────────┘
-```
-
-- **Name plate and health bar:** your form, and progress to the next form with notches at the power-up stages. Below it: the next form, contributions left, and the countdown.
-- **Round timer:** your current streak (days, or weeks in weekly mode) and your best.
-- **Score:** your power level, Dragon Balls held this year, and the next ball.
-- **Arena:** Goku in his ki-charge pose with the Dragon Balls orbiting him in 3D.
-- **Bottom:** your last 14 days as ki bars, and the power-up stage.
-
-## Features
-
-- **Lifetime progression.** Forms are based on career contribution totals, not a rolling 12-month window. A persisted state file makes progression monotonic: old commits aging out never demote you.
-- **10 transformation levels.** Kid Goku through Ultra Instinct as shaded 4-tone pixel art, with a distinct hair sculpt, palette and eyes per form (SSJ3 mane, SSJ4 fur and tail, God slim build, Kid Goku on the cloud).
-- **Ki-charge animation.** 8 frames of hair flutter, sash sway and breathing inside a flame aura that grows with your streak, with rising ki particles and lightning on spark forms. Kid Goku rides the cloud with his tail and power pole.
-- **Power-up stages.** Each form has 3 stages (at one-third and two-thirds of the way to the next form). Each stage grows the aura and adds a hair and body glow, so the card changes every few months instead of once a year.
-- **Next-form countdown.** The card shows how many contributions are left and an estimate such as "super saiyan 3 in ~5 months", from your trailing-year pace.
-- **Yearly Dragon Ball hunt.** The 7 balls come from your last 365 days (10 / 25 / 50 / 100 / 200 / 350 / 500). Collect all 7 to summon Shenron. Balls can be lost after a quiet year; forms never go down.
-- **Streak-driven aura, daily or weekly.** Daily (default): committing today or yesterday keeps the streak alive. Weekly: any contribution in a Monday-Sunday week keeps it alive, for people who don't code every day.
-- **Two output formats.** An animated SVG (real text, vector Dragon Balls, embedded pixel frames) and an 8-frame GIF with the same art and HUD for platforms that don't render SVG.
-- **Transparent scoring.** Power level is `commits × 10 + PRs × 30 + reviews × 20 + best streak × 50`, computed from disjoint lifetime inputs.
-
 ## Progression tables
+
+<p align="center">
+  <img src="./docs/forms.svg" width="100%" alt="All 10 forms, from Kid Goku (0 contributions) to Ultra Instinct (7,000+)" />
+</p>
 
 Forms unlock at lifetime contribution totals:
 
@@ -87,94 +58,87 @@ Aura tiers by current streak:
 
 Thresholds were checked against 243 real profile READMEs that run a contribution widget: the median user sits at Super Saiyan 2, about 7% reach Ultra Instinct, and with power-up stages the median wait for a visible change is about 3 months.
 
-## Setup
+## Features
 
-> The card is generated from this repository's Action, pinned with a `v1` tag.
-> Make sure the tag exists before relying on the workflow.
+- **Lifetime progression.** Forms are based on career contribution totals, not a rolling 12-month window. A persisted state file makes progression monotonic: old commits aging out never demote you.
+- **10 transformation levels.** Kid Goku through Ultra Instinct as shaded 4-tone pixel art, with a distinct hair sculpt, palette and eyes per form (SSJ3 mane, SSJ4 fur and tail, God slim build, Kid Goku on the cloud).
+- **Ki-charge animation.** 8 frames of hair flutter, sash sway and breathing inside a flame aura that grows with your streak, with rising ki particles and lightning on spark forms. Kid Goku rides the cloud with his tail and power pole.
+- **Power-up stages.** Each form has 3 stages (at one-third and two-thirds of the way to the next form). Each stage grows the aura and adds a hair and body glow, so the card changes every few months instead of once a year.
+- **Next-form countdown.** The card shows how many contributions are left and an estimate such as "super saiyan 3 in ~5 months", from your trailing-year pace.
+- **Yearly Dragon Ball hunt.** The 7 balls come from your last 365 days (10 / 25 / 50 / 100 / 200 / 350 / 500). Collect all 7 to summon Shenron. Balls can be lost after a quiet year; forms never go down.
+- **Streak-driven aura, daily or weekly.** Daily (default): committing today or yesterday keeps the streak alive. Weekly: any contribution in a Monday-Sunday week keeps it alive, for people who don't code every day.
+- **Two output formats.** An animated SVG (real text, vector Dragon Balls, embedded pixel frames) and an 8-frame GIF with the same art and HUD for platforms that don't render SVG.
+- **Transparent scoring.** Power level is `commits × 10 + PRs × 30 + reviews × 20 + best streak × 50`, computed from disjoint lifetime inputs.
 
-### 1. Install the workflow
+## Quick start
 
-After building this repository locally (`npm ci && npm run build`), scaffold the
-workflow into the current profile repository:
+Everything happens in the browser and takes about 5 minutes. The full step-by-step walkthrough with troubleshooting is in **[docs/setup.md](./docs/setup.md)**.
 
-```bash
-node dist/cli.js init
-```
+1. **Profile repository.** Open (or [create](https://github.com/new)) the public repository named exactly like your username: `USERNAME/USERNAME`.
+2. **Workflow.** In that repository, create `.github/workflows/saiyan.yml` (**Add file → Create new file**) with this content:
 
-Or create `.github/workflows/saiyan.yml` manually in your profile repository (`username/username`):
+   ```yaml
+   name: Update Git Saiyan
 
-```yaml
-name: Update Git Saiyan
+   on:
+     schedule:
+       - cron: '0 0 * * *'
+     workflow_dispatch:
 
-on:
-  schedule:
-    - cron: '0 0 * * *'
-  workflow_dispatch:
+   permissions:
+     contents: write
 
-permissions:
-  contents: write
+   concurrency:
+     group: git-saiyan
+     cancel-in-progress: true
 
-concurrency:
-  group: git-saiyan
-  cancel-in-progress: true
+   jobs:
+     power-up:
+       runs-on: ubuntu-latest
+       steps:
+         - name: Checkout profile repository
+           uses: actions/checkout@v7
 
-jobs:
-  power-up:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+         - name: Restore progression state
+           run: |
+             git fetch origin output --depth=1 || true
+             git show origin/output:.saiyan-state.json > .saiyan-state.json 2>/dev/null || true
 
-      - name: Restore progression state
-        run: |
-          git fetch origin output --depth=1 || true
-          git show origin/output:.saiyan-state.json > .saiyan-state.json 2>/dev/null || true
+         - name: Run git-saiyan
+           uses: jaeef/git-saiyan@v1
+           with:
+             github_token: ${{ secrets.GITHUB_TOKEN }}
+             outputs: |
+               dist/saiyan.svg
+               dist/saiyan.gif
+             state_file: .saiyan-state.json
+             # streak_mode: weekly   # optional: count weeks instead of days
 
-      - name: Run git-saiyan
-        uses: jaeef/git-saiyan@v1
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          outputs: |
-            dist/saiyan.svg
-            dist/saiyan.gif
-          state_file: .saiyan-state.json
-          # streak_mode: weekly   # optional: count weeks instead of days
+         - name: Publish generated card to the output branch
+           run: |
+             git config user.name "github-actions[bot]"
+             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+             git add -f dist/saiyan.svg dist/saiyan.gif .saiyan-state.json
+             if git rev-parse --verify --quiet origin/output >/dev/null && git diff --staged --quiet origin/output -- dist/saiyan.svg dist/saiyan.gif .saiyan-state.json; then
+               echo "No card changes today."
+             else
+               git commit -m "chore: power up Goku [skip ci]"
+               git push origin HEAD:output --force
+             fi
+   ```
 
-      - name: Publish to output branch
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -f dist/saiyan.svg dist/saiyan.gif .saiyan-state.json
-          # Compare with the published branch, not with main: the card files never
-          # exist on main, so a plain staged diff would report a change every day.
-          if git rev-parse --verify --quiet origin/output >/dev/null && git diff --staged --quiet origin/output -- dist/saiyan.svg dist/saiyan.gif .saiyan-state.json; then
-            echo "No card changes today."
-          else
-            git commit -m "chore: power up Goku [skip ci]"
-            git push origin HEAD:output --force
-          fi
-```
+3. **First run.** Go to **Actions → Update Git Saiyan → Run workflow**. After about 15 seconds the run is green and an `output` branch holds your card. It then updates every night.
+4. **Show it.** Add this to your profile `README.md`, with your username in both places:
 
-### 2. Embed the card
+   ```markdown
+   <p align="center">
+     <img src="https://raw.githubusercontent.com/USERNAME/USERNAME/output/dist/saiyan.svg" width="500" alt="My git-saiyan card" />
+   </p>
+   ```
 
-The Action publishes to an `output` branch so your profile commit history stays clean. Replace `USERNAME` with your GitHub login:
+> **Card shows a lower form than you expect?** Your private contributions aren't counted yet. Turn on **Settings → Public profile → Include private contributions on my profile** and run the workflow again. See [private contributions](./docs/setup.md#5-count-private-contributions) for the token alternative.
 
-```markdown
-<div align="center">
-  <img src="https://raw.githubusercontent.com/USERNAME/USERNAME/output/dist/saiyan.svg" width="500" alt="My git-saiyan card" />
-</div>
-```
-
-Run the workflow once from the Actions tab to generate the first card.
-
-### Private contributions
-
-Private contributions are counted when **Include private contributions on my profile** is enabled in your GitHub profile settings (Contribution settings). GitHub then includes them in the contribution calendar totals that this Action reads, and each one is counted once.
-
-If you keep that setting off and still want them counted, create a classic personal access token for your own account with the `repo` scope, add it as a repository secret (for example `SAIYAN_PAT`), and pass it instead:
-
-```yaml
-github_token: ${{ secrets.SAIYAN_PAT }}
-```
+Prefer the terminal? After `npm ci && npm run build` in this repository, `node dist/cli.js init` writes the workflow into the current profile repository.
 
 ## Action inputs
 
@@ -261,6 +225,7 @@ npm run preview:art -- sheet.png       # contact sheet of every form (args: form
 npm run gallery                         # preview/index.html: every form, full and calm aura
 npm run scenarios                       # preview/scenarios.html: streak scenarios, daily vs weekly
 npm run designs                         # preview/designs.html: card design study
+npm run forms-sheet                     # docs/forms.svg: the all-forms sheet in this README
 ```
 
 CI runs typecheck, the test suite, the build, and verifies that committed `dist/` matches `src/`. `dist/` is committed because the Action needs `dist/action.js` at the tagged ref.

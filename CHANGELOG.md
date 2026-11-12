@@ -4,6 +4,21 @@ All notable changes to this project are documented here.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 versioning follows [SemVer](https://semver.org/).
 
+## [Unreleased]
+
+### Added
+
+- `docs/forms.svg`: all 10 forms with their contribution ranges, shown in the
+  README (`npm run forms-sheet` regenerates it).
+- `docs/setup.md`: step-by-step browser-only setup, private contributions,
+  options, how updates work, and troubleshooting.
+
+### Changed
+
+- README setup is now a short browser-only quick start that links the guide.
+- Workflows use `actions/checkout@v7` and `actions/setup-node@v7` (Node 24),
+  which removes the Node.js 20 deprecation warning.
+
 ## [1.3.0] - 2026-11-12
 
 ### Added

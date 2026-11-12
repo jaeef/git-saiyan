@@ -26872,7 +26872,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout profile repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Restore progression state
         run: |
