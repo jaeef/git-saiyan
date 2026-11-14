@@ -7,6 +7,7 @@
 Lifetime contributions drive a 10-form transformation ladder. Your streak
 drives the ki aura. Each year is a new hunt for the 7 Dragon Balls.
 
+[![Marketplace](https://img.shields.io/badge/Marketplace-Git_Saiyan-orange?logo=github)](https://github.com/marketplace/actions/git-saiyan)
 ![GitHub Action](https://img.shields.io/badge/GitHub_Action-node24-2088FF?logo=github-actions&logoColor=white)
 ![Node](https://img.shields.io/badge/node-%3E%3D22-339933?logo=nodedotjs&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white)
